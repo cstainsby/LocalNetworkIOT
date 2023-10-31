@@ -1,2 +1,15 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+
+<div>
+    <h1>Pi Server</h1>
+    <p>A personal home server</p>
+
+    <div>
+        <h2>Directory</h2>
+        <ul>
+            <li>
+                <a href="dog-tracker-project">Dog Tracker Project</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
