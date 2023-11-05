@@ -1,7 +1,7 @@
 
 
 interface Recipe {
-    name: string, // recipe name
+    name?: string, // recipe name
     description?: string,
     orderedInstructions: string[],
 
