@@ -4,17 +4,23 @@ import type { Recipe, FoodItem } from '$lib/foodBasedTypes';
 
 
 /**
- * Recipe form post endpoint 
+ * Recipe form data type 
  * Form data shape:
  *  recipeName
  *  recipeDescription 
  *  recipeInstruction_<(<0..n>)1..n>
  *  recipeIngredient_<0..n>
  */
-interface RecipeFormData {
-    recipeName: string,
-    recipeDescription: string,
-
+interface RecipeFormData_Ingredient {
+    name: string,
+    portion_metric: string,
+    portion_amount: string
+}
+interface RecipeFormData_Recipe {
+    recipe_name: string,
+    recipe_description: string,
+    recipe_instructions: string[]
+    recipe_ingredients: RecipeFormData_Ingredient[]
 }
 
 
@@ -39,8 +45,8 @@ function extractRecipeFormElements(nestedFormElementDict: Object, formData: Form
 }
 
 /**
- * Because form data comes in the shape of a flattened list of Objects containing kv pairs, we must find a way to unflatten it to make it fit our type specifications.
- * To do this we will be recurrsively steping through a template object created by us designating how to read in and construct the type with the data availible
+ * Because form data comes in the shape of a flattened list of lists containing kv pairs, we must find a way to unflatten it to make it fit our type specifications.
+ * To do this we will be recurrsively steping through a formData entries list 
  * This recurrsion becomes necessary in the context of the following example. Here we can have instruction, sub-instructions for those instructions, 
  *  sub-sub-instructions for those sub-instructions, etc...
  * 
@@ -71,18 +77,17 @@ function extractListedElementsRecurr(nestedFormElementDict: Object, formEntries:
             return null
         }
 
-        const key = entry[0]
-        const [prefix, suffix] = key.split("_")
+        const splitKey = entry[0].split("_")
 
         // if suffix exists
-        if (suffix !== undefined) {
-            // append updated key to the nested
-            const iteratedSuffix = suffix.length === 1 ? "" : "_".concat(suffix.slice(0, suffix.length - 1))
-            const newKey = prefix.concat(iteratedSuffix)
-            formEntryChildren.push([newKey, entry[1]])
-        } else {
+        // if (suffix !== undefined) {
+        //     // append updated key to the nested
+        //     const iteratedSuffix = suffix.length === 1 ? "" : "_".concat(suffix.slice(0, suffix.length - 1))
+        //     const newKey = prefix.concat(iteratedSuffix)
+        //     formEntryChildren.push([newKey, entry[1]])
+        // } else {
             
-        }
+        // }
     });
     
     if (formEntryChildren.length > 0) {
@@ -90,6 +95,16 @@ function extractListedElementsRecurr(nestedFormElementDict: Object, formEntries:
     } 
 
     return {}
+}
+
+function recipeFormDataToRecipe(recipeFormData: RecipeFormData): Recipe {
+    return {
+        name: recipeFormData.recipeName
+        description?: string,
+        orderedInstructions: string[],
+
+        ingredients: FoodItem[],
+    }
 }
 
 
@@ -123,7 +138,7 @@ export const actions = {
         extractRecipeFormElements({}, formData)
 
         // this object is should have the keys be the same as the form but the values be in the
-        // const sampleRecipeFormReturn: RecipeFormData = {}
+        const sampleRecipeFormReturn: RecipeFormData = {}
         
 
         const ingredientFormFields = {

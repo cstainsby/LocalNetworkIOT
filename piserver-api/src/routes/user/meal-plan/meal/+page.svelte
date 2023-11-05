@@ -168,7 +168,7 @@
                     <button type="button" on:click="{() => removeInstruction(index)}">Remove Ingredient</button>
                 </div>
                 <label>
-                    <textarea name="recipeInstruction_{index}" bind:value="{instruction}" />
+                    <textarea name="recipeinstruction_{index}" bind:value="{instruction}" />
                 </label>
             </li>
         {/each}
@@ -188,17 +188,17 @@
             </div>
             <label>
                 Ingredient Name:
-                <input name="recipeIngredientName_{index}" type="text" bind:value="{ingredient.name}" />
+                <input name="recipeingredient_name_{index}" type="text" bind:value="{ingredient.name}" />
             </label>
 
             <label>
                 Portion Metric:
-                <input name="recipeIngredientPortionMetric_{index}" type="text" bind:value="{ingredient.portionMetric}" />
+                <input name="recipeingredient_portionmetric_{index}" type="text" bind:value="{ingredient.portionMetric}" />
             </label>
 
             <label>
                 Portion Amount:
-                <input name="recipeIngredientPortionAmount_{index}" type="number" step="1" bind:value="{ingredient.portionAmount}" />
+                <input name="recipeingredient_portionamount_{index}" type="number" step="1" bind:value="{ingredient.portionAmount}" />
             </label>
         </li>
     {/each}
