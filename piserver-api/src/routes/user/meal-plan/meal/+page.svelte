@@ -3,14 +3,22 @@
 <script lang="ts">
     import type { Recipe } from "$lib/foodBasedTypes";
     import { onDestroy, onMount } from "svelte";
+    import type { ActionData } from "./$types";
+
+    export let form: ActionData;
 
     const LOCALSTORE_RECIPE_FORM_KEY = "newRecipeFormData"
 
     let newRecipe: Recipe = {
-        name: '',
-        description: '',
-        orderedInstructions: [],
-        ingredients: []
+        name: 'sampleRecipe',
+        description: 'This is an example recipe',
+        orderedInstructions: [
+            "Make the food", "Eat the food"
+        ],
+        ingredients: [
+            { name: "lime", portionAmount: 1, portionMetric: "whole" },
+            { name: "coconut", portionAmount: 1, portionMetric: "whole" }
+        ]
     };
 
     let isSaving = false;
@@ -144,16 +152,20 @@
     {/if}
 {/if} -->
 
+{#if form?.success} 
+    <h1>Form Success</h1>
+{/if}
+
 
 <form method="post" action="?/post" on:change={handleFormChange}>
     <label>
         <h3>Title:</h3>
-        <input name="recipeName" type="text" bind:value="{newRecipe.name}" />
+        <input name="recipename" type="text" bind:value="{newRecipe.name}" />
     </label>
 
     <label>
         <h3>Description:</h3>
-        <textarea name="recipeDescription" bind:value="{newRecipe.description}" rows="4"></textarea>
+        <textarea name="recipedescription" bind:value="{newRecipe.description}" rows="4"></textarea>
     </label>
 
     <div class="multiple-item-input-header">
@@ -168,7 +180,7 @@
                     <button type="button" on:click="{() => removeInstruction(index)}">Remove Ingredient</button>
                 </div>
                 <label>
-                    <textarea name="recipeinstruction_{index}" bind:value="{instruction}" />
+                    <textarea name="recipeinstructions_{index}" bind:value="{instruction}" />
                 </label>
             </li>
         {/each}
@@ -188,17 +200,17 @@
             </div>
             <label>
                 Ingredient Name:
-                <input name="recipeingredient_name_{index}" type="text" bind:value="{ingredient.name}" />
+                <input name="recipeingredients_name_{index}" type="text" bind:value="{ingredient.name}" />
             </label>
 
             <label>
                 Portion Metric:
-                <input name="recipeingredient_portionmetric_{index}" type="text" bind:value="{ingredient.portionMetric}" />
+                <input name="recipeingredients_portionmetric_{index}" type="text" bind:value="{ingredient.portionMetric}" />
             </label>
 
             <label>
                 Portion Amount:
-                <input name="recipeingredient_portionamount_{index}" type="number" step="1" bind:value="{ingredient.portionAmount}" />
+                <input name="recipeingredients_portionamount_{index}" type="number" step="1" bind:value="{ingredient.portionAmount}" />
             </label>
         </li>
     {/each}

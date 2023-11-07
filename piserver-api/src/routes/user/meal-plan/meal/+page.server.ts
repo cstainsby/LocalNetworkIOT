@@ -12,100 +12,105 @@ import type { Recipe, FoodItem } from '$lib/foodBasedTypes';
  *  recipeIngredient_<0..n>
  */
 interface RecipeFormData_Ingredient {
-    name: string,
-    portion_metric: string,
-    portion_amount: string
+    name?: string,
+    portion_metric?: string,
+    portion_amount?: string
 }
 interface RecipeFormData_Recipe {
-    recipe_name: string,
-    recipe_description: string,
-    recipe_instructions: string[]
-    recipe_ingredients: RecipeFormData_Ingredient[]
+    recipe_name?: string,
+    recipe_description?: string,
+    recipe_instructions?: string[]
+    recipe_ingredients?: RecipeFormData_Ingredient[]
+}
+
+interface GenericFormData {
+    [key: string]: string | string[] | GenericFormData | GenericFormData[] | undefined
 }
 
 
-function extractRecipeFormElements(nestedFormElementDict: Object, formData: FormData)  {
-    // const extractedElements = {}
+function extractRecipeFormDataElements(formData: FormData): RecipeFormData_Recipe {
+    const rawFormData = extractFormDataElements(formData)
 
-    // groupedElementNames.forEach(elementName => {
-    //     const recipeInstructions: string[] = []
-    //     let i = 0;
-    //     while(formData.get("recipeInstruction".concat(i.toString()))) {
-    //         const recipeInstruction: string | undefined = formData.get("recipeInstruction".concat(i.toString()))?.toString()
-    //         if (recipeInstruction !== undefined) recipeInstructions.push(recipeInstruction)
-    //         i++;
-    //     }
-    // });
+    const recipeName = (rawFormData.recipename) ? rawFormData.recipename as string : ""
+    const recipeDescription = (rawFormData.recipedescription) ? rawFormData.recipedescription as string : ""
+    const recipeInstructions = (rawFormData.recipeinstructions) ? (rawFormData.recipeinstructions as string[]): []
 
-    const formEntries = Array.from(formData.entries())
-    console.log(formEntries);
+    const recipeIngredientObject = (rawFormData.recipeingredients) 
+        ? (rawFormData.recipeingredients as GenericFormData): {}
+    const ingredientNames = (recipeIngredientObject && recipeIngredientObject.name) 
+        ? (recipeIngredientObject.name as string[]): []
+    const ingredientPortionMetrics = (recipeIngredientObject && recipeIngredientObject.portionmetric) 
+        ? (recipeIngredientObject.portionmetric as string[]): []
+    const ingredientPortionAmounts = (recipeIngredientObject && recipeIngredientObject.portionamount) 
+        ? (recipeIngredientObject.portionamount as string[]): []
+
+    const recipeIngredients: RecipeFormData_Ingredient[] = []
+    for (let index = 0; index < ingredientNames.length; index++) {
+        // iterate using ingredient names - they are required
+        const name = ingredientNames[index];
+        const portionMetric = ingredientPortionMetrics[index];
+        const portionAmount = ingredientPortionAmounts[index];
+
+        recipeIngredients.push({
+            name: name,
+            portion_amount: portionAmount,
+            portion_metric: portionMetric
+        })
+    }
     
-
-    // return extractListedElementsRecurr(nestedFormElementDict, formEntries)
-}
-
-/**
- * Because form data comes in the shape of a flattened list of lists containing kv pairs, we must find a way to unflatten it to make it fit our type specifications.
- * To do this we will be recurrsively steping through a formData entries list 
- * This recurrsion becomes necessary in the context of the following example. Here we can have instruction, sub-instructions for those instructions, 
- *  sub-sub-instructions for those sub-instructions, etc...
- * 
- *      e.g. recipeInstruction_01
- * 
- * The suffix will denote as follows:
- *  _   => unique character to define listed element and need for recurrsion
- *  int => each following int from left to right will denote ordering within the current depth
- *          
- *          e.g. _01 will mean that from the second main instruction(1) this example recipeInstruction is the first sub-instruction
- * 
- * @param nestedFormElementDict 
- * @param formEntries 
- * @returns 
- */
-function extractListedElementsRecurr(nestedFormElementDict: Object, formEntries: string[][]): Object | null {
-    const currentIterableElements = Object.entries(nestedFormElementDict)
-
-    // base case -> child element in nested dictionary doesn't have any keys
-    if (currentIterableElements.length === 0) {
-        return null
-    } 
-
-    const formEntryChildren: string[][] = []
-
-    formEntries.forEach(entry  => {
-        if (entry.length !== 2) {
-            return null
-        }
-
-        const splitKey = entry[0].split("_")
-
-        // if suffix exists
-        // if (suffix !== undefined) {
-        //     // append updated key to the nested
-        //     const iteratedSuffix = suffix.length === 1 ? "" : "_".concat(suffix.slice(0, suffix.length - 1))
-        //     const newKey = prefix.concat(iteratedSuffix)
-        //     formEntryChildren.push([newKey, entry[1]])
-        // } else {
-            
-        // }
-    });
-    
-    if (formEntryChildren.length > 0) {
-
-    } 
-
-    return {}
-}
-
-function recipeFormDataToRecipe(recipeFormData: RecipeFormData): Recipe {
     return {
-        name: recipeFormData.recipeName
-        description?: string,
-        orderedInstructions: string[],
-
-        ingredients: FoodItem[],
+        recipe_name: recipeName,
+        recipe_description: recipeDescription,
+        recipe_instructions: recipeInstructions,
+        recipe_ingredients: recipeIngredients
     }
 }
+
+function extractFormDataElements(formData: FormData): GenericFormData {
+    const formEntries = Array.from(formData.entries())
+    // console.log(formEntries);
+    
+    let buildObject: GenericFormData = {};
+
+    for (const [key, formEntryValue] of formEntries) {
+        let currentObject = buildObject;
+        const keys = key.split('_');
+        const value = formEntryValue.toString()
+
+        for (let i = 0; i < keys.length; i++) {
+            const currentKey = keys[i];
+
+            if (i === keys.length - 1) {
+                // Last key, assign the value
+                currentObject[currentKey] = value;
+            } else {
+                // Create nested object if it doesn't exist
+                if (!currentObject[currentKey]) {
+                    currentObject[currentKey] = !isNaN(Number(keys[i + 1])) 
+                        ? [] as GenericFormData[]
+                        : {} as GenericFormData;
+                }
+
+                // Move to the next level of the object
+                currentObject = currentObject[currentKey] as GenericFormData;
+            }
+        }
+    }
+
+    return buildObject;
+}
+
+
+// function recipeFormDataToRecipe(recipeFormData: RecipeFormData_Recipe): Recipe | Error {
+
+//     return {
+//         name: recipeFormData.recipeName
+//         description?: string,
+//         orderedInstructions: string[],
+
+//         ingredients: FoodItem[],
+//     }
+// }
 
 
 export const actions = {
@@ -116,61 +121,11 @@ export const actions = {
     post: async ({ request }) => {
         const formData = await request.formData();
 
-        // const recipeNestedFormElementDict = {
-        //     "recipeName" : "name",
-        //     "recipeDescription": "description",
-        //     "recipeInstruction": [],
-        //     "recipeIngredients"
-        //     "recipeIngredientName"
-        // }
-
-        // const recipeName: string | undefined = formData.get("recipeName")?.toString();
-        // const recipeDescription: string | undefined = formData.get("recipeDescription")?.toString();
-
-        // const recipeInstructions: string[] = []
-        // let i = 0;
-        // while(formData.get("recipeInstruction".concat(i.toString()))) {
-        //     const recipeInstruction: string | undefined = formData.get("recipeInstruction".concat(i.toString()))?.toString()
-        //     if (recipeInstruction !== undefined) recipeInstructions.push(recipeInstruction)
-        //     i++;
-        // }
-        
-        extractRecipeFormElements({}, formData)
-
-        // this object is should have the keys be the same as the form but the values be in the
-        const sampleRecipeFormReturn: RecipeFormData = {}
-        
-
-        const ingredientFormFields = {
-            "recipeIngredientName": {},
-            "recipeIngredientPortionMetric": {}, 
-            "recipeIngredientPortionAmount": {}
-        }
-        
-        // const recipeIngredients: FoodItem[] | undefined = []
-        // let  = 0;
-        // while(formData.get("recipeInstruction".concat(i.toString()))) {
-        //     const recipeInstruction: string | undefined = formData.get("recipeInstruction".concat(i.toString()))?.toString()
-        //     if (recipeInstruction !== undefined) recipeInstructions.push(recipeInstruction)
-        //     i++;
-        // }
         
         
-        // const recipeInstructions: string[] | undefined = filteredInstructions.map((kvpair) => {
-        //     kvpair.
-        //     return [""]
-        // })
-
+        const recipeFormData = extractRecipeFormDataElements(formData)
+        // const createdRecipe = recipeFormDataToRecipe(recipeFormData)
         
-        
-        // const recipe: Recipe = {
-
-        //     name: recipeName,
-        //     description: recipeDescription,
-        //     orderedInstructions: string[],
-
-        //     ingredients: FoodItem[]
-        // }
-        
+        return { success: true }
     }
 } satisfies Actions;
