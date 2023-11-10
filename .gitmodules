@@ -1,0 +1,3 @@
+[submodule "DogTracker"]
+	path = DogTracker
+	url = https://github.com/cstainsby/DogTracker
