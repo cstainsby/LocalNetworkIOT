@@ -1,0 +1,46 @@
+
+{%extends "base.html" %} 
+{%block content%} 
+  
+</div>
+<h3>Devices</h3>
+<ul>
+    {% for device in data["devices"] %}
+        {% if device["in_use"] %}
+            <li><div class="listed-device">
+                <div class="listed-device-title">
+                    <h4>{{ device["device_name"] }}</h4>
+                    <span>Active For: {{ device["time_since_start"] }}</span>
+                </div>
+                <p>Checked Out To: {{ device['user_fname'] }} {{ device['user_lname'] }}</p>
+                <p>Requests per minute: </p>
+                <p>Errors Encountered: </p>
+                
+                <div class="nav-buttons">
+                    <a href="">Current Logs</a>
+                    <a>Past Activity</a>
+                </div>
+            </div></li>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+<!-- <h4>Inactive</h4>
+<ul>
+    {% for device in data["devices"] %}
+        {% if not device["in_use"] %}
+            <li><div class="listed-device">
+                <div class="listed-device-title">
+                    <h4>Device Name</h4>
+                    <span>Active For: </span>
+                </div>
+
+                <div class="nav-buttons">
+                    <button>Past Activity</button>
+                </div>
+            </div></li>
+        {% endif %}
+    {% endfor %}
+</ul> -->
+  
+{% endblock %}

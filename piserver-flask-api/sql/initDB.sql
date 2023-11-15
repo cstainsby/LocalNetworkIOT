@@ -31,22 +31,6 @@ CREATE TABLE IF NOT EXISTS user_table (
     user_desc TEXT,
     identification_num INTEGER NOT NULL
 );
--- INSERT OR IGNORE INTO user_table (fname, lname, idetification_num) VALUES ("Cole", "Stainsby", 0)
---     SELECT "Cole", "Stainsby"
---     WHERE NOT EXISTS (SELECT 1 FROM user_table LIMIT 1);
--- INSERT OR IGNORE INTO user_table (fname, lname, idetification_num) VALUES ("Ross", "Stainsby", 1)
---     SELECT "Ross", "Stainsby"
---     WHERE NOT EXISTS (SELECT 1 FROM user_table LIMIT 1);
--- INSERT INTO user_table (fname, lname, idetification_num) VALUES ("Susan", "Stainsby", 2)
--- SELECT "Susan", "Stainsby"
--- WHERE NOT EXISTS (SELECT 1 FROM user_table WHERE fname = "Susan" AND lname = "Stainsby" LIMIT 1);
--- INSERT INTO user_table (fname, lname, user_desc, idetification_num) VALUES ("Scout", "Stainsby", "Dog", 3)
---     SELECT "Scout", "Stainsby", "Dog"
---     WHERE NOT EXISTS (SELECT 1 FROM user_table LIMIT 1);
-
-
--- Insert initial values into user_table if users with the same first and last name do not exist
-
 
 CREATE TABLE IF NOT EXISTS device_user_checkout_table (
     checkout_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,11 +42,10 @@ CREATE TABLE IF NOT EXISTS device_user_checkout_table (
     FOREIGN KEY (user_id) REFERENCES user_table(user_id)
 );
 
-
 CREATE TABLE IF NOT EXISTS mpu6050_data_table (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creation_time TEXT NOT NULL, -- date
-    generated_by TEXT NOT NULL,
+    generated_by TEXT NOT NULL, -- mac address of device that generated the data
     accel_x REAL NOT NULL,
     accel_y REAL NOT NULL,
     accel_z REAL NOT NULL,
@@ -71,3 +54,11 @@ CREATE TABLE IF NOT EXISTS mpu6050_data_table (
     gyro_z REAL NOT NULL,
     FOREIGN KEY (generated_by) REFERENCES registered_device_table(mac_address)
 );
+
+CREATE TABLE IF NOT EXISTS device_log_table (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    creation_time TEXT NOT NULL, 
+    mac_address TEXT NOT NULL, -- device that made the log
+    request_data TEXT NOT NULL,
+    FOREIGN KEY (mac_address) REFERENCES registered_device_table(mac_address)
+)
