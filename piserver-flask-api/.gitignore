@@ -1,2 +1,4 @@
 __pycache__
 pi_server.db
+
+sql/insertInitialValues.sql

@@ -6,9 +6,18 @@ from datatypes import MPU6050_Data
 app = Flask(__name__)
 db = PiDatabase()
 
+# device mac_address (identifier) to its ip
+active_connections = {}
+
 @app.route('/ping', methods=['GET'])
 def ping():
     return 'Hello from Python server!\n'
+
+@app.route('/registered-devices', methods=["GET", "POST"])
+def registered_devices():
+    if request.method == "GET":
+        pass
+        
 
 @app.route('/dog-tracker/mpu-motion6', methods=['POST'])
 def dog_tracker_motion_data():

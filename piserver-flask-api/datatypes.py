@@ -9,7 +9,7 @@ class MPU6050_Data:
         self.gyro_z: float = None
     
     def __init__(self, json) -> None:
-        self.accel_x: float = json.accel_x if json.accel_x else None  
+        self.accel_x: float = json["accel_x"] if json["accel_x"] else None  
         self.accel_y: float = json["accel_y"] if json["accel_y"] else None 
         self.accel_z: float = json["accel_z"] if json["accel_z"] else None 
         self.gyro_x: float = json["gyro_x"] if json["gyro_x"] else None 
