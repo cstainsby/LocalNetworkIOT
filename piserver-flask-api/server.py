@@ -64,21 +64,78 @@ def home():
 
     return render_template('home_dashboard.html', data=data)
 
-@app.route('/devices/<mac_address>')
+@app.route('/devices/<mac_address>', methods=['GET'])
 def device_view(mac_address: str):
     data = {}
 
     
     return render_template('device_template.html')
 
-@app.route('/devices/logs')
-def device_logs():
+@app.route('/devices/logs', methods=['GET'])
+def device_log_view():
     data = {
         ""
     }
 
     return render_template('device_logs.html')
 
+@app.route('/devices/<mac_address>/logs', methods=['POST'])
+def device_log_data():
+    '''Some things to possibly measure'''
+    #  Device Information:
+    #     Device ID: Unique identifier for each IoT device.
+    #     Device Type: The type or model of the IoT device.
+    #     Firmware Version: The version of the firmware/software running on the device.
+    #     Hardware Information: CPU, memory, storage, etc.
+
+    # Connectivity Metrics:
+    #     Online/Offline Status: Indicates whether the device is currently connected.
+    #     Signal Strength: For wireless devices, the strength of the signal.
+    #     Network Latency: Round-trip time for communication with a server.
+    #     Bandwidth Usage: Amount of data transmitted and received.
+
+    # Power and Battery Status:
+    #     Battery Level: For battery-powered devices.
+    #     Power Source: Whether the device is connected to a power source.
+    #     Power Consumption: Amount of power the device is consuming.
+
+    # Temperature and Environmental Conditions:
+    #     Device Temperature: Internal temperature of the device.
+    #     Humidity Level: For devices sensitive to humidity.
+    #     Atmospheric Pressure: Relevant for certain environmental conditions.
+
+    # Error and Exception Logs:
+    #     Log error messages and exceptions to identify issues.
+    #     Stack Traces: Detailed information about where errors occurred.
+    #     Timestamps: When errors or exceptions were logged.
+
+    # Usage and Performance Metrics:
+    #     CPU Usage: Percentage of CPU being utilized.
+    #     Memory Usage: Amount of RAM being used.
+    #     Storage Usage: Available storage space on the device.
+    #     Processing Time: Time taken to execute specific tasks.
+
+    # Security and Anomaly Detection:
+    #     Unauthorized Access Attempts: Failed login attempts or security breaches.
+    #     Anomalies in Behavior: Unusual patterns in device behavior.
+
+    # Communication Protocols:
+    #     Number of Successful Data Transmissions.
+    #     Number of Failed Data Transmissions.
+
+    # Location Information:
+    #     GPS Coordinates: If applicable.
+    #     Location Updates: Timestamps of when location data is updated.
+
+    # System Uptime:
+    #     Amount of time the device has been continuously running without a restart.
+
+    # Firmware/Software Updates:
+    #     Timestamps of when firmware or software updates were applied.
+
+    # Custom Metrics:
+    #     Any specific metrics relevant to your IoT device and its use case.
+    return 
 
 @app.route('/ping', methods=['GET'])
 def ping():
