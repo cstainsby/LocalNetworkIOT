@@ -59,6 +59,6 @@ CREATE TABLE IF NOT EXISTS device_log_table (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creation_time TEXT NOT NULL, 
     mac_address TEXT NOT NULL, -- device that made the log
-    request_data TEXT NOT NULL,
+    log_data TEXT NOT NULL, -- json formatted log data
     FOREIGN KEY (mac_address) REFERENCES registered_device_table(mac_address)
-)
+);

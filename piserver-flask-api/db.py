@@ -15,6 +15,8 @@ class PiDatabase():
         self.db_path = os.path.join(os.getcwd(), self.DATABASE_NAME)
         database_exist = os.path.exists(self.db_path)
 
+        # if debug_mode and database_exist: os.remove(self.db_path)
+
         conn = sqlite3.connect(self.DATABASE_NAME)
         cursor = conn.cursor()
         
@@ -82,6 +84,44 @@ class PiDatabase():
                 JOIN user_table user ON (user.user_id = checkout.user_id)
             WHERE checkout.end_time IS NULL 
         """)
+        return db_cursor.fetchall()
+    
+    def add_device_log(self, db_cursor: Cursor):
+        db_cursor.execute('''
+            INSERT INTO device_log_table (creation_time, mac_address, log_data)
+            VALUES (?, ?, ?)
+        ''', ())    
+    
+    def get_device_logs_by_parameters(self, db_cursor: Cursor, 
+        device_addr: str = None, 
+        date_from: str = None, 
+        date_to: str = None, 
+        filter_topics: list= [],
+        order_by_topics: list = [],
+        order_by_asc_or_desc = "ASC"
+    ):
+        sql_build_query = '''
+            SELECT dev.mac_address, dev.device_name, log.creation_time, log.log_data
+            FROM device_log_table log
+                JOIN registered_device_table reg ON (log.mac_address = dev.mac_address)
+            WHERE 1=1
+        '''
+
+        # append additional where clauses if necessary
+        if device_addr:
+            sql_build_query += f" AND mac_address = '{device_addr}'"
+        if date_from:
+            sql_build_query += f" AND creation_time >= '{date_from}'"
+        if date_to:
+            sql_build_query += f" AND creation_time <= '{date_to}'"
+        if filter_topics:
+            for topic in filter_topics:
+                sql_build_query += f" AND log_data LIKE '%\"{topic}\":%'"
+        if order_by_topics:
+            order_by_clause = ", ".join(order_by_topics)
+            sql_build_query += f" ORDER BY {order_by_clause} {order_by_asc_or_desc}"
+
+        db_cursor.execute(sql_build_query)
         return db_cursor.fetchall()
 
     def add_dog_motion_data(self, db_cursor: Cursor, data: MPU6050_Data):

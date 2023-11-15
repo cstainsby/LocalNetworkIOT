@@ -1,14 +1,6 @@
 
 class MPU6050_Data:
-    def __init__(self) -> None:
-        self.accel_x: float = None
-        self.accel_y: float = None
-        self.accel_z: float = None
-        self.gyro_x: float = None
-        self.gyro_y: float = None
-        self.gyro_z: float = None
-    
-    def __init__(self, json) -> None:
+    def __init__(self, json: dict) -> None:
         self.accel_x: float = json["accel_x"] if json["accel_x"] else None  
         self.accel_y: float = json["accel_y"] if json["accel_y"] else None 
         self.accel_z: float = json["accel_z"] if json["accel_z"] else None 
@@ -34,3 +26,20 @@ class MPU6050_Data:
                 gyro_z=self.gyro_z
             )
 
+class GenericLog():
+    def __init__(self, json: dict) -> None:
+        self.creation_time: str = json["creation_time"] if json["creation_time"] else None  
+        self.mac_address: str = json["mac_address"] if json["mac_address"] else None 
+        self.log_data: dict = json["log_data"] if json["log_data"] else None 
+
+    def __str__(self) -> str:
+        return """
+            {
+                mac_address: {mac_address},\n
+                creation_time: {creation_time},\n
+                log_data: {log_data},\n
+            }""".format(
+                mac_address=self.mac_address,
+                creation_time=self.creation_time,
+                log_data=self.log_data
+            )

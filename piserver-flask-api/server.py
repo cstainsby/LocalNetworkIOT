@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify, render_template, g
 from datetime import datetime
+import requests
 
 from db import PiDatabase
 from datatypes import MPU6050_Data
 
 DEBUG_MODE = True
 PORT = 8080
+HOST = '0.0.0.0'
 
 app = Flask(__name__)
 dbo = PiDatabase(debug_mode=DEBUG_MODE)
@@ -13,6 +15,12 @@ dbo = PiDatabase(debug_mode=DEBUG_MODE)
 # device mac_address (identifier) to its ip
 active_connections = {}
 
+
+def build_request_to_self(endpoint: str):
+    if endpoint: 
+        return "http://" + HOST + ":" + str(PORT) + endpoint
+    else: 
+        return ""
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -73,73 +81,50 @@ def device_view(mac_address: str):
 
 @app.route('/devices/logs', methods=['GET'])
 def device_log_view():
-    data = {
-        ""
-    }
+    request_endpoint = build_request_to_self("/api/devices/logs")
+    data = requests.get(request_endpoint)
+
+    print(data)
 
     return render_template('device_logs.html')
-
-@app.route('/devices/<mac_address>/logs', methods=['POST'])
-def device_log_data():
-    '''Some things to possibly measure'''
-    #  Device Information:
-    #     Device ID: Unique identifier for each IoT device.
-    #     Device Type: The type or model of the IoT device.
-    #     Firmware Version: The version of the firmware/software running on the device.
-    #     Hardware Information: CPU, memory, storage, etc.
-
-    # Connectivity Metrics:
-    #     Online/Offline Status: Indicates whether the device is currently connected.
-    #     Signal Strength: For wireless devices, the strength of the signal.
-    #     Network Latency: Round-trip time for communication with a server.
-    #     Bandwidth Usage: Amount of data transmitted and received.
-
-    # Power and Battery Status:
-    #     Battery Level: For battery-powered devices.
-    #     Power Source: Whether the device is connected to a power source.
-    #     Power Consumption: Amount of power the device is consuming.
-
-    # Temperature and Environmental Conditions:
-    #     Device Temperature: Internal temperature of the device.
-    #     Humidity Level: For devices sensitive to humidity.
-    #     Atmospheric Pressure: Relevant for certain environmental conditions.
-
-    # Error and Exception Logs:
-    #     Log error messages and exceptions to identify issues.
-    #     Stack Traces: Detailed information about where errors occurred.
-    #     Timestamps: When errors or exceptions were logged.
-
-    # Usage and Performance Metrics:
-    #     CPU Usage: Percentage of CPU being utilized.
-    #     Memory Usage: Amount of RAM being used.
-    #     Storage Usage: Available storage space on the device.
-    #     Processing Time: Time taken to execute specific tasks.
-
-    # Security and Anomaly Detection:
-    #     Unauthorized Access Attempts: Failed login attempts or security breaches.
-    #     Anomalies in Behavior: Unusual patterns in device behavior.
-
-    # Communication Protocols:
-    #     Number of Successful Data Transmissions.
-    #     Number of Failed Data Transmissions.
-
-    # Location Information:
-    #     GPS Coordinates: If applicable.
-    #     Location Updates: Timestamps of when location data is updated.
-
-    # System Uptime:
-    #     Amount of time the device has been continuously running without a restart.
-
-    # Firmware/Software Updates:
-    #     Timestamps of when firmware or software updates were applied.
-
-    # Custom Metrics:
-    #     Any specific metrics relevant to your IoT device and its use case.
-    return 
 
 @app.route('/ping', methods=['GET'])
 def ping():
     return 'Hello from Python server!\n'
+
+
+@app.route('/api/devices/logs', methods=["GET", "POST"])
+def device_log_api():
+    if request.method == "GET":
+        # get query parameters
+        device_addr = request.args.get("device_addr", default=None)
+        date_from = request.args.get("date_from", default=None)
+        date_to = request.args.get("date_to", default=None)
+        filter_topics = request.args.get("filter_topics", default=[]).split(',')
+        order_by_topics = request.args.get("order_by_topics", default=[]).split(',')
+        order_by_asc_or_desc = request.args.get("order_by_asc_or_desc", default="ASC").split(',')
+
+        with app.app_context():
+            conn = dbo.get_db()
+            cursor = conn.cursor()
+
+            logs = dbo.get_device_logs_by_parameters(
+                cursor, device_addr, date_from, date_to, 
+                filter_topics, order_by_topics, order_by_asc_or_desc)
+            
+            conn.commit()
+        return jsonify({'status': 'success', 'data': logs})
+        
+    elif request.method == "POST":
+        pass
+
+    return
+
+@app.route('/devices/<mac_address>/logs', methods=['POST'])
+def device_log_data():
+    '''Some things to possibly measure'''
+    
+    return 
 
 # @app.route('/registered-devices', methods=["GET", "POST"])
 # def registered_devices():
@@ -175,5 +160,4 @@ def dog_tracker_motion_data():
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
- 
-    app.run(host='0.0.0.0', port=PORT, debug=DEBUG_MODE)
+    app.run(host=HOST, port=PORT, debug=DEBUG_MODE)
