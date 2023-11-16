@@ -20,8 +20,8 @@
 
 CREATE TABLE IF NOT EXISTS registered_device_table (
     mac_address TEXT PRIMARY KEY,
-    device_name TEXT,
-    device_desc TEXT
+    device_name TEXT NOT NULL,
+    device_desc TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_table (

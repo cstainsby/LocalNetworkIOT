@@ -3,4 +3,39 @@
 
 <h1>Device Logs</h1>
 
+<form>
+
+    <label for="device">Select Device:</label>
+    <select id="device">
+        <option value="">--</option>
+        {% for device in devices %}
+            <option value="{{ device['mac_address'] }}">{{ device["device_name"] }} - {{ device['mac_address'] }}</option>
+        {% endfor %}
+    </select> 
+
+    <label for="keywords-input">Keywords:</label>
+    <input id="keywords-input" type="text"/>
+
+    <label for="start-time-input">From:</label>
+    <input id="start-time-input" type="datetime-local">
+
+    <label for="end-time-input">To:</label>
+    <input id="end-time-input" type="datetime-local">
+
+    <button>Filter</button>
+</form>
+
+<ol>
+    {% for log in logs %}
+        <li class="device-log">
+            <div class="device-log-metainfo">
+                <h3>{{ log["device_name"] }}</h3>
+                <p>- {{ log["mac_address"] }}</p>
+                <p>{{ log["creation_time"] }}</p>
+            </div>
+            <p>{{ log["log_data"] }}</p>
+        </li>
+    {% endfor %}
+</ol>
+
 {% endblock %}

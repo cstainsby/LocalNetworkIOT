@@ -3,6 +3,7 @@ from datetime import datetime
 import requests
 
 from db import PiDatabase
+import server_helpers
 from datatypes import MPU6050_Data
 
 DEBUG_MODE = True
@@ -81,12 +82,27 @@ def device_view(mac_address: str):
 
 @app.route('/devices/logs', methods=['GET'])
 def device_log_view():
+    logs = []
+    devices = []
+
     request_endpoint = build_request_to_self("/api/devices/logs")
-    data = requests.get(request_endpoint)
+    log_json_data = requests.get(request_endpoint).json()
 
-    print(data)
+    for log in log_json_data["data"]:
+        logs.append({
+            "mac_address": log[0],
+            "device_name": log[1],
+            "creation_time": log[2],
+            "log_data": log[3]
+        })
+    
+    # get all devices which have logs
+    devices = server_helpers.get_unique_rows_at_given_col("mac_address", logs)
+    devices = server_helpers.drop_cols(["creation_time", "log_data"], devices)
 
-    return render_template('device_logs.html')
+    print(list(devices))
+
+    return render_template('device_logs.html', devices=devices, logs=logs)
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -100,9 +116,9 @@ def device_log_api():
         device_addr = request.args.get("device_addr", default=None)
         date_from = request.args.get("date_from", default=None)
         date_to = request.args.get("date_to", default=None)
-        filter_topics = request.args.get("filter_topics", default=[]).split(',')
-        order_by_topics = request.args.get("order_by_topics", default=[]).split(',')
-        order_by_asc_or_desc = request.args.get("order_by_asc_or_desc", default="ASC").split(',')
+        filter_topics = request.args.get("filter_topics", default="").split(',')
+        order_by_topics = request.args.get("order_by_topics", default="").split(',')
+        order_by_asc_or_desc = request.args.get("order_by_asc_or_desc", default="ASC")
 
         with app.app_context():
             conn = dbo.get_db()
@@ -120,20 +136,29 @@ def device_log_api():
 
     return
 
-@app.route('/devices/<mac_address>/logs', methods=['POST'])
-def device_log_data():
-    '''Some things to possibly measure'''
+# @app.route('/devices/<mac_address>/logs', methods=['POST'])
+# def device_log_data():
+#     '''Some things to possibly measure'''
     
-    return 
+#     return 
 
-# @app.route('/registered-devices', methods=["GET", "POST"])
-# def registered_devices():
-#     if request.method == "GET":
-#         return jsonify({})
-#         return dbo.get_registered_devices()
+@app.route('/api/registered-devices', methods=["GET", "POST"])
+def registered_devices():
+    if request.method == "GET":
+        devices = []
+
+        with app.app_context():
+            conn = dbo.get_db()
+            cursor = conn.cursor()
+
+            devices = dbo.get_all_devices(cursor)
+            
+            conn.commit()
+
+        return jsonify({'status': 'success', 'data': devices})
     
-#     elif request.method == "POST":
-#         return
+    elif request.method == "POST":
+        return
 
 
 

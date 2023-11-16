@@ -3,12 +3,13 @@
 <html lang="en"> 
 <head> 
     <title>Pi-Server</title> 
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
 </head> 
 <body> 
     <div id="nav-bar">
         <h1>Pi-Server API Dashboard</h1> 
-        <a href="/">Home</a>
-        <a href="/devices/logs">Logs</a>
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/devices/logs">Logs</a>
     </div>
 
     {% block content %} 

@@ -7,13 +7,19 @@ from datatypes import MPU6050_Data
 
 class PiDatabase():
     def __init__(self, debug_mode=False) -> None:
+        print("------------- INITIALIZING DATABASE -------------")
         if debug_mode:
             self.DATABASE_NAME = 'test.db'
+            print("Set to debug mode")
         else:
             self.DATABASE_NAME = 'pi_server.db'
+            print("Set to production mode")
 
         self.db_path = os.path.join(os.getcwd(), self.DATABASE_NAME)
         database_exist = os.path.exists(self.db_path)
+
+        print("database " + self.db_path 
+            + (" does " if database_exist else " doesn't ") + "exist")
 
         # if debug_mode and database_exist: os.remove(self.db_path)
 
@@ -21,6 +27,7 @@ class PiDatabase():
         cursor = conn.cursor()
         
         if not database_exist:
+            print("Creating new database instance...")
             with open("sql/initDB.sql", 'r') as sql_file:
                 file_contents = sql_file.read()
                 cursor.executescript(file_contents)
@@ -33,10 +40,12 @@ class PiDatabase():
                     cursor.executescript(file_contents)
                 conn.commit()
             else:
+                print("Loading base production values...")
                 with open("sql/insertInitialValues.sql", 'r') as sql_file:
                     file_contents = sql_file.read()
                     cursor.executescript(file_contents)
                 conn.commit()
+        print("-------------------------------------------------")
 
     def get_db(self):
         db = getattr(g, '_database', None)
@@ -103,7 +112,7 @@ class PiDatabase():
         sql_build_query = '''
             SELECT dev.mac_address, dev.device_name, log.creation_time, log.log_data
             FROM device_log_table log
-                JOIN registered_device_table reg ON (log.mac_address = dev.mac_address)
+                JOIN registered_device_table dev ON (log.mac_address = dev.mac_address)
             WHERE 1=1
         '''
 
@@ -114,14 +123,14 @@ class PiDatabase():
             sql_build_query += f" AND creation_time >= '{date_from}'"
         if date_to:
             sql_build_query += f" AND creation_time <= '{date_to}'"
-        if filter_topics:
-            for topic in filter_topics:
-                sql_build_query += f" AND log_data LIKE '%\"{topic}\":%'"
-        if order_by_topics:
-            order_by_clause = ", ".join(order_by_topics)
-            sql_build_query += f" ORDER BY {order_by_clause} {order_by_asc_or_desc}"
+        # if filter_topics and len(filter_topics) > 0:
+        #     for topic in filter_topics:
+        #         sql_build_query += f" AND log_data LIKE '%\"{topic}\":%'"
+        # if order_by_topics:
+        #     order_by_clause = ", ".join(order_by_topics)
+        #     sql_build_query += f" ORDER BY {order_by_clause} {order_by_asc_or_desc}"
 
-        db_cursor.execute(sql_build_query)
+        db_cursor.execute(sql_build_query + ';')
         return db_cursor.fetchall()
 
     def add_dog_motion_data(self, db_cursor: Cursor, data: MPU6050_Data):
