@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 def get_unique_rows_at_given_col(column: str, data: List[dict]) -> List[dict]:
     seen_values = set()
@@ -23,3 +23,14 @@ def drop_cols(col_list: List[str], data: List[dict]) -> List[dict]:
 
     return build_list
 
+def add_request_parameters(requestUrl: str, parameters: List[Tuple[str, str]]): 
+    build_url = requestUrl
+    for i, parameter in enumerate(parameters):
+        if i == 0: build_url += "?"
+        else: build_url += "&"
+
+        param_name = parameter[0] 
+        param_value = parameter[1]
+
+        build_url += str(param_name) + "=" + str(param_value) 
+    return build_url

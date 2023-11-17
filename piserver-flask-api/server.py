@@ -82,11 +82,23 @@ def device_view(mac_address: str):
 
 @app.route('/devices/logs', methods=['GET'])
 def device_log_view():
+    params = []
     logs = []
     devices = []
+    
+    # get query parameters
+    device_addr = request.args.get("device_addr", default=None)
+    if device_addr: params.append(("device_addr", device_addr))
+    # params.append(("date_from", request.args.get("date_from", default=None)))
+    # params.append(("date_to", request.args.get("date_to", default=None)))
+    # params.append(("filter_topics", request.args.get("filter_topics", default="").split(',')))
+    # params.append(("order_by_topics", request.args.get("order_by_topics", default="").split(',')))
+    # params.append(("order_by_asc_or_desc", request.args.get("order_by_asc_or_desc", default="ASC")))
 
-    request_endpoint = build_request_to_self("/api/devices/logs")
-    log_json_data = requests.get(request_endpoint).json()
+
+    logs_request_endpoint = build_request_to_self("/api/devices/logs")
+    logs_request_endpoint_with_params = server_helpers.add_request_parameters(logs_request_endpoint, params)
+    log_json_data = requests.get(logs_request_endpoint_with_params).json()
 
     for log in log_json_data["data"]:
         logs.append({
@@ -96,11 +108,15 @@ def device_log_view():
             "log_data": log[3]
         })
     
-    # get all devices which have logs
-    devices = server_helpers.get_unique_rows_at_given_col("mac_address", logs)
-    devices = server_helpers.drop_cols(["creation_time", "log_data"], devices)
+    # get all devices 
+    devices_request_endpoint = build_request_to_self("/api/registered-devices")
+    device_json_data = requests.get(devices_request_endpoint).json()
 
-    print(list(devices))
+    for device in device_json_data["data"]:
+        devices.append({
+            "mac_address": device[0],
+            "device_name": device[1]
+        })
 
     return render_template('device_logs.html', devices=devices, logs=logs)
 
@@ -114,19 +130,22 @@ def device_log_api():
     if request.method == "GET":
         # get query parameters
         device_addr = request.args.get("device_addr", default=None)
-        date_from = request.args.get("date_from", default=None)
-        date_to = request.args.get("date_to", default=None)
-        filter_topics = request.args.get("filter_topics", default="").split(',')
-        order_by_topics = request.args.get("order_by_topics", default="").split(',')
-        order_by_asc_or_desc = request.args.get("order_by_asc_or_desc", default="ASC")
+        # date_from = request.args.get("date_from", default=None)
+        # date_to = request.args.get("date_to", default=None)
+        # filter_topics = request.args.get("filter_topics", default="").split(',')
+        # order_by_topics = request.args.get("order_by_topics", default="").split(',')
+        # order_by_asc_or_desc = request.args.get("order_by_asc_or_desc", default="ASC")
 
+        
         with app.app_context():
             conn = dbo.get_db()
             cursor = conn.cursor()
 
+            # logs = dbo.get_device_logs_by_parameters(
+            #     cursor, device_addr, date_from, date_to, 
+            #     filter_topics, order_by_topics, order_by_asc_or_desc)
             logs = dbo.get_device_logs_by_parameters(
-                cursor, device_addr, date_from, date_to, 
-                filter_topics, order_by_topics, order_by_asc_or_desc)
+                cursor, device_addr)
             
             conn.commit()
         return jsonify({'status': 'success', 'data': logs})

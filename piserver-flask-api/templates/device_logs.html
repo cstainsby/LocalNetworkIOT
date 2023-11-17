@@ -22,7 +22,7 @@
     <label for="end-time-input">To:</label>
     <input id="end-time-input" type="datetime-local">
 
-    <button>Filter</button>
+    <button type="button" onclick="applySearchFilter()">Filter</button>
 </form>
 
 <ol>
@@ -30,12 +30,57 @@
         <li class="device-log">
             <div class="device-log-metainfo">
                 <h3>{{ log["device_name"] }}</h3>
-                <p>- {{ log["mac_address"] }}</p>
-                <p>{{ log["creation_time"] }}</p>
+                <p> - {{ log["mac_address"] }}</p>
+                <p class="device-log-creation-datetime">{{ log["creation_time"] }}</p>
             </div>
             <p>{{ log["log_data"] }}</p>
         </li>
     {% endfor %}
 </ol>
 
+
+<script>
+    
+    function concatUrlParameterSeparator(filterPreviouslyApplied, currUrl) {
+        if (filterPreviouslyApplied) {
+            return currUrl += "&"
+        } else {
+            return currUrl += "?"
+        }
+    }
+
+    function applySearchFilter() {
+        var filterApplied = false;
+
+        // Get form values
+        var deviceValue = document.getElementById('device').value;
+        var keywordsValue = document.getElementById('keywords-input').value;
+        var startTimeValue = document.getElementById('start-time-input').value;
+        var endTimeValue = document.getElementById('end-time-input').value;
+
+        // Construct the new URL with parameters
+        var newUrl = window.location.pathname;
+        
+        if (deviceValue && deviceValue != "") {
+            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'device_addr=' + deviceValue;
+            filterApplied = true;
+        }
+        if (keywordsValue && keywordsValue != "") {
+            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'keywords=' + keywordsValue;
+            if (!filterApplied) filterApplied = true
+        } 
+        console.log(startTimeValue);
+        if (startTimeValue) {
+            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'start-time-input=' + startTimeValue;
+            if (!filterApplied) filterApplied = true
+        } 
+        if (endTimeValue) {
+            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'end-time-input=' + endTimeValue;
+            if (!filterApplied) filterApplied = true
+        } 
+
+        // Redirect to the new URL
+        window.location.href = newUrl;
+    }
+</script>
 {% endblock %}

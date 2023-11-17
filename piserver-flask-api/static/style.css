@@ -31,13 +31,21 @@ body {
 
 
 .device-log {
-    padding: 4px;
+    padding: 8px;
     margin: 4px;
     background-color: lightgray;
     border-radius: 4px;
+
 }
 .device-log-metainfo {
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+.device-log-metainfo > * {
+    margin: 0px;
+    padding: 0px;
+}
+.device-log-creation-datetime {
+    margin-left: auto;
 }

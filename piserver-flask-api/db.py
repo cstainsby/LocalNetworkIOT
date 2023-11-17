@@ -118,11 +118,11 @@ class PiDatabase():
 
         # append additional where clauses if necessary
         if device_addr:
-            sql_build_query += f" AND mac_address = '{device_addr}'"
+            sql_build_query += f" AND dev.mac_address = '{device_addr}'"
         if date_from:
-            sql_build_query += f" AND creation_time >= '{date_from}'"
+            sql_build_query += f" AND log.creation_time >= '{date_from}'"
         if date_to:
-            sql_build_query += f" AND creation_time <= '{date_to}'"
+            sql_build_query += f" AND log.creation_time <= '{date_to}'"
         # if filter_topics and len(filter_topics) > 0:
         #     for topic in filter_topics:
         #         sql_build_query += f" AND log_data LIKE '%\"{topic}\":%'"
