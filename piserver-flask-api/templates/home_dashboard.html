@@ -13,12 +13,12 @@
                     <span>Active For: {{ device["time_since_start"] }}</span>
                 </div>
                 <p>Checked Out To: {{ device['user_fname'] }} {{ device['user_lname'] }}</p>
-                <p>Requests per minute: </p>
-                <p>Errors Encountered: </p>
+                <!-- <p>Requests per minute: </p>
+                <p>Errors Encountered: </p> -->
                 
                 <div class="nav-buttons">
-                    <a href="">Current Logs</a>
-                    <a>Past Activity</a>
+                    <a href="/devices/logs?device_addr={{ device['mac_address'] }}" class="nav-link">Current Logs</a>
+                    <!-- <a>Past Activity</a> -->
                 </div>
             </div></li>
         {% endif %}
