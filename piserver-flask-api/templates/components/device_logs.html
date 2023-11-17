@@ -1,7 +1,14 @@
-{%extends "base.html" %} 
-{%block content%} 
+
 
 <h1>Device Logs</h1>
+
+Each log will be labeled with a code which describes the content within, and will make filtering through types of logs possible.
+These codes include:
+<ol>
+    <li>Informational</li>
+    <li>Error</li>
+    <li>Success</li>
+</ol>
 
 <form>
 
@@ -11,6 +18,14 @@
         {% for device in devices %}
             <option value="{{ device['mac_address'] }}">{{ device["device_name"] }} - {{ device['mac_address'] }}</option>
         {% endfor %}
+    </select> 
+
+    <label for="log-status-code">Status:</label>
+    <select id="log-status-code">
+        <option value="">--</option>
+        <option value="0">Info</option>
+        <option value="1">Error</option>
+        <option value="2">Success</option>
     </select> 
 
     <!-- <label for="keywords-input">Keywords:</label>
@@ -29,11 +44,25 @@
     {% for log in logs %}
         <li class="device-log">
             <div class="device-log-metainfo">
+                <button class="device-log-toggle-button">More</button>
                 <h3>{{ log["device_name"] }}</h3>
                 <p> - {{ log["mac_address"] }}</p>
                 <p class="device-log-creation-datetime">{{ log["creation_time"] }}</p>
             </div>
-            <p>{{ log["log_data"] }}</p>
+            <div class="device-log-content hidden">
+                <div class="device-log-content-additional-info">
+                    <h4>Additional Info</h4>
+                    <p>Device Type - {{ log["device_type"] }} </p>
+                    <p>Used By - <a href="/devices/checkout/{{ log['checkout_id'] }}">
+                        {{ log["user_fname"] }} {{ log["user_lname"] }}
+                        #{{ log["checkout_id"] }}
+                    </a></p>
+                </div>
+                <div class="device-log-content-json">
+                    <h4>Json Response:</h4>
+                    <pre>{{ log["log_data"] | tojson_pretty | safe }}</pre>
+                </div>
+            </div>
         </li>
     {% endfor %}
 </ol>
@@ -86,5 +115,22 @@
         // Redirect to the new URL
         window.location.href = newUrl;
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        let logToggleButtons = document.querySelectorAll(".device-log-toggle-button");
+        console.log(logToggleButtons);
+        logToggleButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                if (button.textContent == "More") {
+                    button.textContent = "Less";
+                } else {
+                    button.textContent = "More";
+                }
+                console.log("Button clicked");
+                let logItem = button.closest(".device-log");
+                let contentDiv = logItem.querySelector(".device-log-content");
+                contentDiv.classList.toggle('hidden');
+            });
+        });
+    });
 </script>
-{% endblock %}

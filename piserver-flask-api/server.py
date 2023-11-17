@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template, g
 from datetime import datetime
 import requests
+import json
 
 from db import PiDatabase
 import server_helpers
@@ -28,6 +29,11 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+def to_pretty_json(json_val):
+    temp_json_dict = json.loads(json_val)
+    return json.dumps(temp_json_dict, sort_keys=True, indent=4, separators=(',', ': '))
+app.jinja_env.filters["tojson_pretty"] = to_pretty_json
 
 @app.route("/", methods=['GET'])
 def home():
@@ -90,9 +96,11 @@ def device_log_view():
     device_addr = request.args.get("device_addr", default=None)
     start_time = request.args.get("datetime_from", default=None)
     end_time = request.args.get("datetime_to", default=None)
+    checkout_id = request.args.get("checkout_id", default=None)
     if device_addr: params.append(("device_addr", device_addr))
     if start_time: params.append(("datetime_from", start_time))
     if end_time: params.append(("datetime_to", end_time))
+    if checkout_id: params.append(("checkout_id", checkout_id))
     # params.append(("filter_topics", request.args.get("filter_topics", default="").split(',')))
     # params.append(("order_by_topics", request.args.get("order_by_topics", default="").split(',')))
     # params.append(("order_by_asc_or_desc", request.args.get("order_by_asc_or_desc", default="ASC")))
@@ -106,8 +114,12 @@ def device_log_view():
         logs.append({
             "mac_address": log[0],
             "device_name": log[1],
-            "creation_time": log[2],
-            "log_data": log[3]
+            "device_type": log[2],
+            "creation_time": log[3],
+            "log_data": log[4],
+            "checkout_id": log[5],
+            "user_fname": log[6],
+            "user_lname": log[7]
         })
     
     # get all devices 
@@ -119,8 +131,17 @@ def device_log_view():
             "mac_address": device[0],
             "device_name": device[1]
         })
+    
+    
 
-    return render_template('device_logs.html', devices=devices, logs=logs)
+    return render_template('log_page.html', devices=devices, logs=logs)
+
+
+@app.route('/devices/checkout/<checkout_id>')
+def checkout_view(checkout_id):
+    return render_template("checkout_page.html")
+
+
 
 @app.route('/ping', methods=['GET'])
 def ping():

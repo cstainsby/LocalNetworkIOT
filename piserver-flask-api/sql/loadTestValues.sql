@@ -1,12 +1,12 @@
 
 -- Inserting data into registered_device_table
-INSERT INTO registered_device_table (mac_address, device_name, device_desc) VALUES 
-    ('00:11:22:33:44:55', 'Device1', 'Description for Device1'),
-    ('AA:BB:CC:DD:EE:FF', 'Device2', 'Description for Device2'),
-    ('11:22:33:44:55:66', 'Device3', 'Description for Device3'),
-    ('22:33:44:55:66:77', 'Device4', 'Description for Device4'),
-    ('33:44:55:66:77:88', 'Device5', 'Description for Device5'),
-    ('44:55:66:77:88:99', 'Device6', 'Description for Device6');
+INSERT INTO registered_device_table (mac_address, device_name, device_type, device_desc) VALUES 
+    ('00:11:22:33:44:55', 'Device1', 'MPU6050', 'Description for Device1'),
+    ('AA:BB:CC:DD:EE:FF', 'Device2', 'MPU6050', 'Description for Device2'),
+    ('11:22:33:44:55:66', 'Device3', 'MPU6050', 'Description for Device3'),
+    ('22:33:44:55:66:77', 'Device4', 'RaspberryPi', 'Description for Device4'),
+    ('33:44:55:66:77:88', 'Device5', 'MPU6050', 'Description for Device5'),
+    ('44:55:66:77:88:99', 'Device6', 'RaspberryPi', 'Description for Device6');
 
 
 -- Inserting data into device_user_checkout_table

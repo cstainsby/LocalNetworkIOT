@@ -110,9 +110,12 @@ class PiDatabase():
         order_by_asc_or_desc = "ASC"
     ):
         sql_build_query = '''
-            SELECT dev.mac_address, dev.device_name, log.creation_time, log.log_data
+            SELECT dev.mac_address, dev.device_name, dev.device_type, log.creation_time, log.log_data,
+                checkout.checkout_id, user.fname, user.lname
             FROM device_log_table log
                 JOIN registered_device_table dev ON (log.mac_address = dev.mac_address)
+                JOIN device_user_checkout_table checkout ON (log.mac_address = checkout.device_mac_address)
+                JOIN user_table user ON (checkout.user_id = user.user_id)
             WHERE 1=1
         '''
 

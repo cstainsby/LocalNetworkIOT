@@ -21,6 +21,7 @@
 CREATE TABLE IF NOT EXISTS registered_device_table (
     mac_address TEXT PRIMARY KEY,
     device_name TEXT NOT NULL,
+    device_type TEXT NOT NULL,
     device_desc TEXT NOT NULL
 );
 

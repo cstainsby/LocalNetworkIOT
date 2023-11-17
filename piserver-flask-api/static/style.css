@@ -9,6 +9,10 @@
     /* Add more color variables as needed */
 }
 
+.hidden {
+    display: none;
+}
+
 body {
     background-color: var(--background-color);
     color: var(--text-color);
@@ -49,3 +53,14 @@ body {
 .device-log-creation-datetime {
     margin-left: auto;
 }
+/* .device-log-content {
+    display: flex;
+    flex-direction: row;
+}
+.device-log-content-additional-info {
+    width: 20%;
+}
+.device-log-content-divider {
+    margin-left: 16px;
+    margin-right: 16px;
+} */
