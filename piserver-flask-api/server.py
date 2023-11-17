@@ -88,9 +88,11 @@ def device_log_view():
     
     # get query parameters
     device_addr = request.args.get("device_addr", default=None)
+    start_time = request.args.get("datetime_from", default=None)
+    end_time = request.args.get("datetime_to", default=None)
     if device_addr: params.append(("device_addr", device_addr))
-    # params.append(("date_from", request.args.get("date_from", default=None)))
-    # params.append(("date_to", request.args.get("date_to", default=None)))
+    if start_time: params.append(("datetime_from", start_time))
+    if end_time: params.append(("datetime_to", end_time))
     # params.append(("filter_topics", request.args.get("filter_topics", default="").split(',')))
     # params.append(("order_by_topics", request.args.get("order_by_topics", default="").split(',')))
     # params.append(("order_by_asc_or_desc", request.args.get("order_by_asc_or_desc", default="ASC")))
@@ -130,8 +132,8 @@ def device_log_api():
     if request.method == "GET":
         # get query parameters
         device_addr = request.args.get("device_addr", default=None)
-        # date_from = request.args.get("date_from", default=None)
-        # date_to = request.args.get("date_to", default=None)
+        date_from = request.args.get("datetime_from", default=None)
+        date_to = request.args.get("datetime_to", default=None)
         # filter_topics = request.args.get("filter_topics", default="").split(',')
         # order_by_topics = request.args.get("order_by_topics", default="").split(',')
         # order_by_asc_or_desc = request.args.get("order_by_asc_or_desc", default="ASC")
@@ -141,11 +143,9 @@ def device_log_api():
             conn = dbo.get_db()
             cursor = conn.cursor()
 
-            # logs = dbo.get_device_logs_by_parameters(
-            #     cursor, device_addr, date_from, date_to, 
-            #     filter_topics, order_by_topics, order_by_asc_or_desc)
             logs = dbo.get_device_logs_by_parameters(
-                cursor, device_addr)
+                cursor, device_addr, date_from, date_to) 
+                # filter_topics, order_by_topics, order_by_asc_or_desc)
             
             conn.commit()
         return jsonify({'status': 'success', 'data': logs})

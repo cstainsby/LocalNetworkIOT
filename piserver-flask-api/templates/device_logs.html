@@ -5,16 +5,16 @@
 
 <form>
 
-    <label for="device">Select Device:</label>
-    <select id="device">
+    <label for="device-addr-input">Select Device:</label>
+    <select id="device-addr-input">
         <option value="">--</option>
         {% for device in devices %}
             <option value="{{ device['mac_address'] }}">{{ device["device_name"] }} - {{ device['mac_address'] }}</option>
         {% endfor %}
     </select> 
 
-    <label for="keywords-input">Keywords:</label>
-    <input id="keywords-input" type="text"/>
+    <!-- <label for="keywords-input">Keywords:</label>
+    <input id="keywords-input" type="text"/> -->
 
     <label for="start-time-input">From:</label>
     <input id="start-time-input" type="datetime-local">
@@ -40,7 +40,11 @@
 
 
 <script>
-    
+    const urlParams = new URLSearchParams(window.location.search);
+    document.getElementById("device-addr-input").value = urlParams.get("device_addr");
+    document.getElementById('start-time-input').value = urlParams.get("datetime_from");
+    document.getElementById('end-time-input').value = urlParams.get("datetime_to");
+
     function concatUrlParameterSeparator(filterPreviouslyApplied, currUrl) {
         if (filterPreviouslyApplied) {
             return currUrl += "&"
@@ -53,8 +57,8 @@
         var filterApplied = false;
 
         // Get form values
-        var deviceValue = document.getElementById('device').value;
-        var keywordsValue = document.getElementById('keywords-input').value;
+        var deviceValue = document.getElementById('device-addr-input').value;
+        // var keywordsValue = document.getElementById('keywords-input').value;
         var startTimeValue = document.getElementById('start-time-input').value;
         var endTimeValue = document.getElementById('end-time-input').value;
 
@@ -65,17 +69,17 @@
             newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'device_addr=' + deviceValue;
             filterApplied = true;
         }
-        if (keywordsValue && keywordsValue != "") {
-            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'keywords=' + keywordsValue;
-            if (!filterApplied) filterApplied = true
-        } 
+        // if (keywordsValue && keywordsValue != "") {
+        //     newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'keywords=' + keywordsValue;
+        //     if (!filterApplied) filterApplied = true
+        // } 
         console.log(startTimeValue);
         if (startTimeValue) {
-            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'start-time-input=' + startTimeValue;
+            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'datetime_from=' + startTimeValue;
             if (!filterApplied) filterApplied = true
         } 
         if (endTimeValue) {
-            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'end-time-input=' + endTimeValue;
+            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'datetime_to=' + endTimeValue;
             if (!filterApplied) filterApplied = true
         } 
 
