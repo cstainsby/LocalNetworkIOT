@@ -40,28 +40,44 @@ These codes include:
     <button type="button" onclick="applySearchFilter()">Filter</button>
 </form>
 
+
 <ol>
     {% for log in logs %}
         <li class="device-log">
-            <div class="device-log-metainfo">
-                <button class="device-log-toggle-button">More</button>
+            <!-- <div class="device-log-metainfo">
+                
+            </div> -->
+            <button class="device-log-toggle-button">More</button>
+            <div class="device-log-device-identifier">
                 <h3>{{ log["device_name"] }}</h3>
                 <p> - {{ log["mac_address"] }}</p>
-                <p class="device-log-creation-datetime">{{ log["creation_time"] }}</p>
             </div>
-            <div class="device-log-content hidden">
-                <div class="device-log-content-additional-info">
-                    <h4>Additional Info</h4>
-                    <p>Device Type - {{ log["device_type"] }} </p>
-                    <p>Used By - <a href="/devices/checkout/{{ log['checkout_id'] }}">
-                        {{ log["user_fname"] }} {{ log["user_lname"] }}
-                        #{{ log["checkout_id"] }}
-                    </a></p>
-                </div>
-                <div class="device-log-content-json">
-                    <h4>Json Response:</h4>
-                    <pre>{{ log["log_data"] | tojson_pretty | safe }}</pre>
-                </div>
+            <p class="device-log-status-message"
+                {% if log['status_code'] == '0' %} 
+                    style="color: #2980b9;" 
+                {% elif log['status_code'] == '1' %}
+                    style="color: #c0392b;"
+                {% elif log['status_code'] == '2' %}
+                    style="color: #27ae60;"
+                {% endif %}>
+                {{ log["log_descriptor"] }}
+            </p>
+            <p class="device-log-creation-datetime">{{ log["creation_time"] }}</p>
+
+
+            <!-- <div class="device-log-content hidden">
+            </div> -->
+            <div class="device-log-content-additional-info hidden">
+                <h4>Additional Info</h4>
+                <p>Device Type - {{ log["device_type"] }} </p>
+                <p>Used By - <a href="/devices/checkout/{{ log['checkout_id'] }}">
+                    {{ log["user_fname"] }} {{ log["user_lname"] }}
+                    #{{ log["checkout_id"] }}
+                </a></p>
+            </div>
+            <div class="device-log-content-json hidden">
+                <h4>Json Response:</h4>
+                <pre>{{ log["log_data"] | tojson_pretty | safe }}</pre>
             </div>
         </li>
     {% endfor %}
@@ -73,6 +89,7 @@ These codes include:
     document.getElementById("device-addr-input").value = urlParams.get("device_addr");
     document.getElementById('start-time-input').value = urlParams.get("datetime_from");
     document.getElementById('end-time-input').value = urlParams.get("datetime_to");
+    document.getElementById('log-status-code').value = urlParams.get("status_code");
 
     function concatUrlParameterSeparator(filterPreviouslyApplied, currUrl) {
         if (filterPreviouslyApplied) {
@@ -87,6 +104,7 @@ These codes include:
 
         // Get form values
         var deviceValue = document.getElementById('device-addr-input').value;
+        var statusCode = document.getElementById('log-status-code').value;
         // var keywordsValue = document.getElementById('keywords-input').value;
         var startTimeValue = document.getElementById('start-time-input').value;
         var endTimeValue = document.getElementById('end-time-input').value;
@@ -98,11 +116,14 @@ These codes include:
             newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'device_addr=' + deviceValue;
             filterApplied = true;
         }
+        if (statusCode && statusCode != "") {
+            newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'status_code=' + statusCode;
+            filterApplied = true;
+        }
         // if (keywordsValue && keywordsValue != "") {
         //     newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'keywords=' + keywordsValue;
         //     if (!filterApplied) filterApplied = true
         // } 
-        console.log(startTimeValue);
         if (startTimeValue) {
             newUrl = concatUrlParameterSeparator(filterApplied, newUrl) + 'datetime_from=' + startTimeValue;
             if (!filterApplied) filterApplied = true
@@ -118,7 +139,7 @@ These codes include:
 
     document.addEventListener('DOMContentLoaded', function() {
         let logToggleButtons = document.querySelectorAll(".device-log-toggle-button");
-        console.log(logToggleButtons);
+        
         logToggleButtons.forEach(function(button) {
             button.addEventListener('click', function() {
                 if (button.textContent == "More") {
@@ -126,10 +147,11 @@ These codes include:
                 } else {
                     button.textContent = "More";
                 }
-                console.log("Button clicked");
                 let logItem = button.closest(".device-log");
-                let contentDiv = logItem.querySelector(".device-log-content");
-                contentDiv.classList.toggle('hidden');
+                let additionalInfo = logItem.querySelector(".device-log-content-additional-info");
+                let jsonResponse = logItem.querySelector(".device-log-content-json");
+                additionalInfo.classList.toggle('hidden');
+                jsonResponse.classList.toggle('hidden');
             });
         });
     });

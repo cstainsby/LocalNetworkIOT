@@ -40,25 +40,40 @@ body {
     background-color: lightgray;
     border-radius: 4px;
 
-}
-.device-log-metainfo {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-areas: 
+        "device-id status-msg creation-datetime toggle-button"
+        "additional-info json-response json-response json-response"; 
+    grid-template-columns: 0.5fr 1fr 1fr 0.1fr;
     align-items: center;
 }
-.device-log-metainfo > * {
-    margin: 0px;
-    padding: 0px;
+
+.device-log-device-identifier {
+    display: flex;
+    flex-direction: row;
+    align-items: center; 
+    
+    grid-area: device-id;
 }
-.device-log-creation-datetime {
-    margin-left: auto;
+.device-log-status-message { 
+    grid-area: status-msg;
+}
+.device-log-toggle-button { 
+    grid-area: toggle-button;
+}
+.device-log-creation-datetime { 
+    grid-area: creation-datetime;
+}
+
+.device-log-content-json {
+    grid-area: json-response;
+}
+.device-log-content-additional-info {
+    grid-area: additional-info;
 }
 /* .device-log-content {
     display: flex;
     flex-direction: row;
-}
-.device-log-content-additional-info {
-    width: 20%;
 }
 .device-log-content-divider {
     margin-left: 16px;

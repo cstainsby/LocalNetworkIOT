@@ -66,22 +66,22 @@ WHERE NOT EXISTS (
     LIMIT 1
 );
 
-INSERT INTO device_log_table (creation_time, mac_address, log_data)
+INSERT INTO device_log_table (creation_time, status_code, mac_address, log_data)
 VALUES
-    ('2023-01-01 12:00:00', '00:11:22:33:44:55', '{"entry_number": 1, "random_value": 0.123}'),
-    ('2023-01-02 12:30:00', 'AA:BB:CC:DD:EE:FF', '{"entry_number": 2, "random_value": 0.456}'),
-    ('2023-01-03 13:00:00', '11:22:33:44:55:66', '{"entry_number": 3, "random_value": 0.789}'),
-    ('2023-01-04 13:30:00', '22:33:44:55:66:77', '{"entry_number": 4, "random_value": 0.234}'),
-    ('2023-01-05 14:00:00', '33:44:55:66:77:88', '{"entry_number": 5, "random_value": 0.567}'),
-    ('2023-01-06 14:30:00', '44:55:66:77:88:99', '{"entry_number": 6, "random_value": 0.890}'),
-    ('2023-01-07 15:00:00', '00:11:22:33:44:55', '{"entry_number": 7, "random_value": 0.123}'),
-    ('2023-01-08 15:30:00', 'AA:BB:CC:DD:EE:FF', '{"entry_number": 8, "random_value": 0.456}'),
-    ('2023-01-09 16:00:00', '11:22:33:44:55:66', '{"entry_number": 9, "random_value": 0.789}'),
-    ('2023-01-10 16:30:00', '22:33:44:55:66:77', '{"entry_number": 10, "random_value": 0.234}'),
-    ('2023-01-11 17:00:00', '33:44:55:66:77:88', '{"entry_number": 11, "random_value": 0.567}'),
-    ('2023-01-12 17:30:00', '44:55:66:77:88:99', '{"entry_number": 12, "random_value": 0.890}'),
-    ('2023-01-13 18:00:00', '00:11:22:33:44:55', '{"entry_number": 13, "random_value": 0.123}'),
-    ('2023-01-14 18:30:00', 'AA:BB:CC:DD:EE:FF', '{"entry_number": 14, "random_value": 0.456}'),
-    ('2023-01-15 19:00:00', '11:22:33:44:55:66', '{"entry_number": 15, "random_value": 0.789}'),
-    ('2023-01-16 19:30:00', '22:33:44:55:66:77', '{"entry_number": 16, "random_value": 0.234}');
+    ('2023-01-01 12:00:00', 0, '00:11:22:33:44:55', '{"entry_number": 1, "random_value": 0.123}'),
+    ('2023-01-02 12:30:00', 1, 'AA:BB:CC:DD:EE:FF', '{"entry_number": 2, "random_value": 0.456}'),
+    ('2023-01-03 13:00:00', 2, '11:22:33:44:55:66', '{"entry_number": 3, "random_value": 0.789}'),
+    ('2023-01-04 13:30:00', 1, '22:33:44:55:66:77', '{"entry_number": 4, "random_value": 0.234}'),
+    ('2023-01-05 14:00:00', 0, '33:44:55:66:77:88', '{"entry_number": 5, "random_value": 0.567}'),
+    ('2023-01-06 14:30:00', 0, '44:55:66:77:88:99', '{"entry_number": 6, "random_value": 0.890}'),
+    ('2023-01-07 15:00:00', 1, '00:11:22:33:44:55', '{"entry_number": 7, "random_value": 0.123}'),
+    ('2023-01-08 15:30:00', 1, 'AA:BB:CC:DD:EE:FF', '{"entry_number": 8, "random_value": 0.456}'),
+    ('2023-01-09 16:00:00', 2, '11:22:33:44:55:66', '{"entry_number": 9, "random_value": 0.789}'),
+    ('2023-01-10 16:30:00', 2, '22:33:44:55:66:77', '{"entry_number": 10, "random_value": 0.234}'),
+    ('2023-01-11 17:00:00', 0, '33:44:55:66:77:88', '{"entry_number": 11, "random_value": 0.567}'),
+    ('2023-01-12 17:30:00', 1, '44:55:66:77:88:99', '{"entry_number": 12, "random_value": 0.890}'),
+    ('2023-01-13 18:00:00', 2, '00:11:22:33:44:55', '{"entry_number": 13, "random_value": 0.123}'),
+    ('2023-01-14 18:30:00', 0, 'AA:BB:CC:DD:EE:FF', '{"entry_number": 14, "random_value": 0.456}'),
+    ('2023-01-15 19:00:00', 0, '11:22:33:44:55:66', '{"entry_number": 15, "random_value": 0.789}'),
+    ('2023-01-16 19:30:00', 0, '22:33:44:55:66:77', '{"entry_number": 16, "random_value": 0.234}');
 

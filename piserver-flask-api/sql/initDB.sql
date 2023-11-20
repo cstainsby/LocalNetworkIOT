@@ -61,8 +61,7 @@ CREATE TABLE IF NOT EXISTS mpu6050_data_table (
 CREATE TABLE IF NOT EXISTS device_log_table (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creation_time TEXT NOT NULL, 
-    -- device_type TEXT NOT NULL, 
-    -- status_code INTEGER NOT NULL,
+    status_code INTEGER NOT NULL,
     mac_address TEXT NOT NULL, -- device that made the log
     log_data TEXT NOT NULL, -- json formatted log data
     FOREIGN KEY (mac_address) REFERENCES registered_device_table(mac_address)

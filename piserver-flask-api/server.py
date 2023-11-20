@@ -97,10 +97,12 @@ def device_log_view():
     start_time = request.args.get("datetime_from", default=None)
     end_time = request.args.get("datetime_to", default=None)
     checkout_id = request.args.get("checkout_id", default=None)
+    status_code = request.args.get("status_code", default=None)
     if device_addr: params.append(("device_addr", device_addr))
     if start_time: params.append(("datetime_from", start_time))
     if end_time: params.append(("datetime_to", end_time))
     if checkout_id: params.append(("checkout_id", checkout_id))
+    if status_code: params.append(("status_code", status_code))
     # params.append(("filter_topics", request.args.get("filter_topics", default="").split(',')))
     # params.append(("order_by_topics", request.args.get("order_by_topics", default="").split(',')))
     # params.append(("order_by_asc_or_desc", request.args.get("order_by_asc_or_desc", default="ASC")))
@@ -111,15 +113,23 @@ def device_log_view():
     log_json_data = requests.get(logs_request_endpoint_with_params).json()
 
     for log in log_json_data["data"]:
+        log_data = log[5]
+        
+        # extract log descriptor
+        log_descriptor = json.loads(log_data).log_title if "log_title" in json.loads(log_data) else ""
+        
         logs.append({
             "mac_address": log[0],
             "device_name": log[1],
             "device_type": log[2],
             "creation_time": log[3],
-            "log_data": log[4],
-            "checkout_id": log[5],
-            "user_fname": log[6],
-            "user_lname": log[7]
+            "status_code": str(log[4]),
+            "log_data": log[5],
+            "checkout_id": log[6],
+            "user_fname": log[7],
+            "user_lname": log[8],
+
+            "log_descriptor": "status code"
         })
     
     # get all devices 
@@ -155,6 +165,8 @@ def device_log_api():
         device_addr = request.args.get("device_addr", default=None)
         date_from = request.args.get("datetime_from", default=None)
         date_to = request.args.get("datetime_to", default=None)
+        checkout_id = request.args.get("checkout_id", default=None)
+        status_code = request.args.get("status_code", default=None)
         # filter_topics = request.args.get("filter_topics", default="").split(',')
         # order_by_topics = request.args.get("order_by_topics", default="").split(',')
         # order_by_asc_or_desc = request.args.get("order_by_asc_or_desc", default="ASC")
@@ -165,7 +177,8 @@ def device_log_api():
             cursor = conn.cursor()
 
             logs = dbo.get_device_logs_by_parameters(
-                cursor, device_addr, date_from, date_to) 
+                cursor, device_addr, date_from, date_to,
+                checkout_id, status_code) 
                 # filter_topics, order_by_topics, order_by_asc_or_desc)
             
             conn.commit()

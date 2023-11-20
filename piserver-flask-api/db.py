@@ -104,13 +104,16 @@ class PiDatabase():
     def get_device_logs_by_parameters(self, db_cursor: Cursor, 
         device_addr: str = None, 
         date_from: str = None, 
-        date_to: str = None, 
+        date_to: str = None,
+        checkout_id: int = None,
+        status_code: int = None, 
         filter_topics: list= [],
         order_by_topics: list = [],
         order_by_asc_or_desc = "ASC"
     ):
         sql_build_query = '''
-            SELECT dev.mac_address, dev.device_name, dev.device_type, log.creation_time, log.log_data,
+            SELECT dev.mac_address, dev.device_name, dev.device_type, 
+                log.creation_time, log.status_code, log.log_data,
                 checkout.checkout_id, user.fname, user.lname
             FROM device_log_table log
                 JOIN registered_device_table dev ON (log.mac_address = dev.mac_address)
@@ -126,13 +129,17 @@ class PiDatabase():
             sql_build_query += f" AND log.creation_time >= '{date_from}'"
         if date_to:
             sql_build_query += f" AND log.creation_time <= '{date_to}'"
+        if checkout_id:
+            sql_build_query += f" AND checkout.checkout_id = '{checkout_id}'"
+        if status_code:
+            sql_build_query += f" AND log.status_code = '{status_code}'"
         # if filter_topics and len(filter_topics) > 0:
         #     for topic in filter_topics:
         #         sql_build_query += f" AND log_data LIKE '%\"{topic}\":%'"
         # if order_by_topics:
         #     order_by_clause = ", ".join(order_by_topics)
         #     sql_build_query += f" ORDER BY {order_by_clause} {order_by_asc_or_desc}"
-
+        
         db_cursor.execute(sql_build_query + ';')
         return db_cursor.fetchall()
 
