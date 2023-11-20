@@ -96,13 +96,19 @@ def device_log_view():
     device_addr = request.args.get("device_addr", default=None)
     start_time = request.args.get("datetime_from", default=None)
     end_time = request.args.get("datetime_to", default=None)
-    checkout_id = request.args.get("checkout_id", default=None)
     status_code = request.args.get("status_code", default=None)
+    curr_checkout_only = request.args.get("curr_checkout_only", default=None)
+
+    # get most recent checkout id
+    # checkout_id = 
+
+    # append formated parameters for api call
     if device_addr: params.append(("device_addr", device_addr))
     if start_time: params.append(("datetime_from", start_time))
     if end_time: params.append(("datetime_to", end_time))
-    if checkout_id: params.append(("checkout_id", checkout_id))
+    # if checkout_id: params.append(("checkout_id", checkout_id))
     if status_code: params.append(("status_code", status_code))
+    # if status_code: params.append(("curr_checkout_only", curr_checkout_only))
     # params.append(("filter_topics", request.args.get("filter_topics", default="").split(',')))
     # params.append(("order_by_topics", request.args.get("order_by_topics", default="").split(',')))
     # params.append(("order_by_asc_or_desc", request.args.get("order_by_asc_or_desc", default="ASC")))
@@ -116,7 +122,7 @@ def device_log_view():
         log_data = log[5]
         
         # extract log descriptor
-        log_descriptor = json.loads(log_data).log_title if "log_title" in json.loads(log_data) else ""
+        log_descriptor = json.loads(log_data).log_title if "log_title" in json.loads(log_data) else "No Descriptor Added."
         
         logs.append({
             "mac_address": log[0],
@@ -129,7 +135,7 @@ def device_log_view():
             "user_fname": log[7],
             "user_lname": log[8],
 
-            "log_descriptor": "status code"
+            "log_descriptor": log_descriptor
         })
     
     # get all devices 

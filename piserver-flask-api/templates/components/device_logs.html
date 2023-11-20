@@ -1,47 +1,55 @@
 
-
+<div class="logs-page">
 <h1>Device Logs</h1>
 
-Each log will be labeled with a code which describes the content within, and will make filtering through types of logs possible.
-These codes include:
-<ol>
-    <li>Informational</li>
-    <li>Error</li>
-    <li>Success</li>
-</ol>
-
-<form>
-
-    <label for="device-addr-input">Select Device:</label>
-    <select id="device-addr-input">
-        <option value="">--</option>
-        {% for device in devices %}
-            <option value="{{ device['mac_address'] }}">{{ device["device_name"] }} - {{ device['mac_address'] }}</option>
-        {% endfor %}
-    </select> 
-
-    <label for="log-status-code">Status:</label>
-    <select id="log-status-code">
-        <option value="">--</option>
-        <option value="0">Info</option>
-        <option value="1">Error</option>
-        <option value="2">Success</option>
-    </select> 
-
-    <!-- <label for="keywords-input">Keywords:</label>
-    <input id="keywords-input" type="text"/> -->
-
-    <label for="start-time-input">From:</label>
-    <input id="start-time-input" type="datetime-local">
-
-    <label for="end-time-input">To:</label>
-    <input id="end-time-input" type="datetime-local">
-
-    <button type="button" onclick="applySearchFilter()">Filter</button>
-</form>
+<div class="logs-header">
+    <div class="logs-informational">
+        Each log will be labeled with a code which describes the content within, and will make filtering through types of logs possible.
+        These codes include:
+        <ol>
+            <li>Informational</li>
+            <li>Error</li>
+            <li>Success</li>
+        </ol>
+    </div>
 
 
-<ol>
+    <form id="filterForm">
+        <label for="device-addr-input">Select Device:</label>
+        <select id="device-addr-input" onchange="deviceIdSelectChange()">
+            <option value="">--</option>
+            {% for device in devices %}
+                <option value="{{ device['mac_address'] }}">{{ device["device_name"] }} - {{ device['mac_address'] }}</option>
+            {% endfor %}
+        </select> 
+
+        <!-- <label id="current-checkout-only-label" for="current-checkout-only" class="hidden">Current Checkout Only?</label>
+        <input id="current-checkout-only" type="checkbox" class="hidden"/> -->
+
+        <label for="log-status-code">Status:</label>
+        <select id="log-status-code">
+            <option value="">--</option>
+            <option value="0">Info</option>
+            <option value="1">Error</option>
+            <option value="2">Success</option>
+        </select> 
+
+        <!-- <label for="keywords-input">Keywords:</label>
+        <input id="keywords-input" type="text"/> -->
+
+        <label for="start-time-input">From:</label>
+        <input id="start-time-input" type="datetime-local">
+
+        <label for="end-time-input">To:</label>
+        <input id="end-time-input" type="datetime-local">
+
+        <button type="button" onclick="applySearchFilter()">Filter</button>
+    </form>
+</div>
+
+
+{% if logs %}
+<ol class="log-list">
     {% for log in logs %}
         <li class="device-log">
             <!-- <div class="device-log-metainfo">
@@ -62,7 +70,7 @@ These codes include:
                 {% endif %}>
                 {{ log["log_descriptor"] }}
             </p>
-            <p class="device-log-creation-datetime">{{ log["creation_time"] }}</p>
+            <p class="device-log-creation-datetime">Created At: <b>{{ log["creation_time"] }}</b></p>
 
 
             <!-- <div class="device-log-content hidden">
@@ -82,6 +90,11 @@ These codes include:
         </li>
     {% endfor %}
 </ol>
+{% else %}
+    <h3>There is no data which appears to match your query.</h3>
+    <img src="{{ url_for('static', filename='media/kermit-the-look.gif') }}" alt="Kermit being mad confused">
+{% endif %}
+</div>  
 
 
 <script>
@@ -90,6 +103,27 @@ These codes include:
     document.getElementById('start-time-input').value = urlParams.get("datetime_from");
     document.getElementById('end-time-input').value = urlParams.get("datetime_to");
     document.getElementById('log-status-code').value = urlParams.get("status_code");
+    document.getElementById('current-checkout-only').value = urlParams.get("curr_checkout_only");
+
+    
+
+    // function renderCheckoutCheckbox() {
+    //     const onlyCurrCheckoutLabel = document.getElementById("current-checkout-only-label");
+    //     const onlyCurrCheckoutCheckbox = document.getElementById("current-checkout-only");
+    //     const deviceSelection = document.getElementById('device-addr-input');
+        
+    //     if ( deviceSelection.value === "") {
+    //         onlyCurrCheckoutLabel.classList.add("hidden");
+    //         onlyCurrCheckoutCheckbox.classList.add("hidden");
+    //     } else {
+    //         onlyCurrCheckoutLabel.classList.remove("hidden");
+    //         onlyCurrCheckoutCheckbox.classList.remove("hidden");
+    //     }
+    // }
+
+    function deviceIdSelectChange() {
+        // renderCheckoutCheckbox();
+    }
 
     function concatUrlParameterSeparator(filterPreviouslyApplied, currUrl) {
         if (filterPreviouslyApplied) {
@@ -147,12 +181,18 @@ These codes include:
                 } else {
                     button.textContent = "More";
                 }
+                console.log(button);
                 let logItem = button.closest(".device-log");
+                console.log(logItem);
                 let additionalInfo = logItem.querySelector(".device-log-content-additional-info");
+                console.log(additionalInfo);
                 let jsonResponse = logItem.querySelector(".device-log-content-json");
                 additionalInfo.classList.toggle('hidden');
                 jsonResponse.classList.toggle('hidden');
             });
         });
     });
+
+    // Render extra form elements if conditions match 
+    // renderCheckoutCheckbox();
 </script>

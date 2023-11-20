@@ -34,6 +34,29 @@ body {
 
 
 
+.logs-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.logs-header {
+    display: flex;
+    flex-direction: row;
+}
+.logs-informational {
+    margin: 8px;
+}
+#filterForm {
+    display: flex;
+    flex-direction: column;
+    margin: 8px;
+}
+
+
+.log-list {
+    width: 80%;
+}
 .device-log {
     padding: 8px;
     margin: 4px;
