@@ -142,6 +142,32 @@ class PiDatabase():
         
         db_cursor.execute(sql_build_query + ';')
         return db_cursor.fetchall()
+    
+    def get_all_projects(self, db_cursor: Cursor):
+        db_cursor.execute('''
+            SELECT * 
+            FROM project_table
+        ''')
+        return db_cursor.fetchall()
+
+    def get_project_by_id(self, db_cursor: Cursor, project_id: int):
+        db_cursor.execute(f'''
+            SELECT * 
+            FROM project_table
+            WHERE project_id = {project_id}
+        ''')
+        return db_cursor.fetchone()
+    
+    def get_devices_by_project_id(self, db_cursor: Cursor, project_id: int):
+        '''
+        Get all devices associated with a project
+        '''
+        db_cursor.execute(f'''
+            SELECT * 
+            FROM device_user_checkout_table
+            WHERE project_id = {project_id}
+        ''')
+        return db_cursor.fetchall()
 
     def add_dog_motion_data(self, db_cursor: Cursor, data: MPU6050_Data):
         db_cursor.execute('''

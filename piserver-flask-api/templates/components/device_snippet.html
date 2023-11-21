@@ -1,0 +1,18 @@
+
+
+
+<div class="listed-device">
+    <div class="listed-device-title">
+        <h4>{{ device["device_name"] }}</h4>
+        <span>Active For: {{ device["time_since_start"] }}</span>
+    </div>
+    <p>Checked Out To: {{ device['user_fname'] }} {{ device['user_lname'] }}</p>
+    <!-- <p>Requests per minute: </p>
+    <p>Errors Encountered: </p> -->
+    
+    <div class="nav-buttons">
+        <a href="/devices/logs?device_addr={{ device['mac_address'] }}" class="nav-link">Current Logs</a>
+        <!-- <a>Past Activity</a> -->
+    </div>
+</div>
+

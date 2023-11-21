@@ -1,46 +1,41 @@
 
 {%extends "base.html" %} 
 {%block content%} 
-  
+<div id="home-dashboard">
+    <section>
+        <h3>Active Devices</h3>
+        <a href="/devices" class="nav-link">All Devices</a>
+        <ul>
+            {% for device in devices %}
+                {% if device["in_use"] %}
+                    <li>{% include 'components/device_snippet.html'%}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section>
+        <h3>Projects</h3>
+        <a href="/projects" class="nav-link">All Projects</a>
+        <ul>
+            {% for project in projects %}
+                <li>{% include 'components/project_snippet.html' %}</li>
+            {% endfor %}
+        </ul>
+    </section>
 </div>
-<h3>Devices</h3>
-<ul>
-    {% for device in data["devices"] %}
-        {% if device["in_use"] %}
-            <li><div class="listed-device">
-                <div class="listed-device-title">
-                    <h4>{{ device["device_name"] }}</h4>
-                    <span>Active For: {{ device["time_since_start"] }}</span>
-                </div>
-                <p>Checked Out To: {{ device['user_fname'] }} {{ device['user_lname'] }}</p>
-                <!-- <p>Requests per minute: </p>
-                <p>Errors Encountered: </p> -->
-                
-                <div class="nav-buttons">
-                    <a href="/devices/logs?device_addr={{ device['mac_address'] }}" class="nav-link">Current Logs</a>
-                    <!-- <a>Past Activity</a> -->
-                </div>
-            </div></li>
-        {% endif %}
-    {% endfor %}
-</ul>
 
-<!-- <h4>Inactive</h4>
-<ul>
-    {% for device in data["devices"] %}
-        {% if not device["in_use"] %}
-            <li><div class="listed-device">
-                <div class="listed-device-title">
-                    <h4>Device Name</h4>
-                    <span>Active For: </span>
-                </div>
 
-                <div class="nav-buttons">
-                    <button>Past Activity</button>
-                </div>
-            </div></li>
-        {% endif %}
-    {% endfor %}
-</ul> -->
+<style>
+#home-dashboard {
+    display: flex;
+    flex-direction: row;
+}
+section {
+    margin: 8px;
+    padding: 8px;
+}
+</style>
+
   
 {% endblock %}

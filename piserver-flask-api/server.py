@@ -37,9 +37,8 @@ app.jinja_env.filters["tojson_pretty"] = to_pretty_json
 
 @app.route("/", methods=['GET'])
 def home():
-    data = {
-        "devices": []
-    }
+    devices = []
+    projects = []
 
     with app.app_context():
         conn = dbo.get_db()
@@ -52,32 +51,94 @@ def home():
             current_time = datetime.now()
 
             time_dff = current_time - timestamp_datetime
+            # print("time difference " + str(time_dff.days))
 
             # Extract hours, minutes, and seconds from the time difference
+            days = time_dff.days
             hours, remainder = divmod(time_dff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
 
-            data["devices"].append({
+            devices.append({
                 "in_use": True,
                 "mac_address": device[0],
                 "device_name": device[1],
                 "device_desc": device[2],
-                "time_since_start": f"{hours} hrs, {minutes} minutes",
+                "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
                 "user_fname": device[4],
                 "user_lname": device[5]
             })
-        # non_in_use_devices = dbo.get_deactivated_devices(cursor)
-        # for device in non_in_use_devices:
-        #     data["devices"].append({
-        #         "in_use": False,
-        #         "mac_address": device[0],
-        #         "device_name": device[1],
-        #         "device_desc": device[2],
-        #         "end_time": device[3]
-        #     })
+
+        raw_projects = dbo.get_all_projects(cursor)
+        
+        for raw_project in raw_projects:
+            projects.append({
+                "project_id": raw_project[0],
+                "project_title": raw_project[1],
+                "project_desc": raw_project[2],
+                "creation_date": raw_project[3],
+                "github_link": raw_project[4] 
+            })
+        
         conn.commit()
 
-    return render_template('home_dashboard.html', data=data)
+    return render_template('home_dashboard.html', devices=devices, projects=projects)
+
+@app.route('/projects', methods=["GET"]) 
+def all_projects_view():
+    projects = []
+
+    projects_list_request = build_request_to_self("/api/projects")
+    projects_json_data = requests.get(projects_list_request).json()
+
+    if projects_json_data["status"] == "success": 
+        for project in projects_json_data["data"]:
+
+            projects.append({
+                "project_id": project[0],
+                "title": project[1],
+                "desc": project[2],
+                "created_on": project[3],
+                "github_link": project[4]
+            })
+
+    return render_template('projects_page.html', projects=projects)
+
+@app.route('/projects/<project_id>', methods=["GET"])
+def project_info_view(project_id):
+    project = {}
+    assocc_devices = []
+    contributors = []
+
+    projects_list_request = build_request_to_self(f"/api/projects/{project_id}")
+    projects_json_data = requests.get(projects_list_request).json()
+
+    project = {
+        "project_id": projects_json_data["data"][0],
+        "title": projects_json_data["data"][1],
+        "desc": projects_json_data["data"][2],
+        "created_on": projects_json_data["data"][3],
+        "github_link": projects_json_data["data"][4]
+    }
+
+    assocc_devices_list_request = build_request_to_self(f"/api/projects/{project_id}/devices")
+    assocc_devices_json_data = requests.get(assocc_devices_list_request).json()
+    
+    print(assocc_devices_json_data)
+    # for assocc_device in assocc_devices_json_data["data"]:
+    #     currently_in_use = True if assocc_devices[5] else False 
+
+    #     assocc_devices.append({
+    #         "in_use": currently_in_use,
+    #         "mac_address": assocc_device[1],
+    #         "device_name": assocc_device[2],
+    #         "device_desc": assocc_device[3],
+    #         "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
+    #         "user_fname": assocc_device[4],
+    #         "user_lname": assocc_device[5]
+    #     })
+
+    return render_template("project_info_page.html", project=project, devices=assocc_devices)
+
 
 @app.route('/devices/<mac_address>', methods=['GET'])
 def device_view(mac_address: str):
@@ -192,14 +253,67 @@ def device_log_api():
         
     elif request.method == "POST":
         pass
-
-    return
+    else:
+        return jsonify({"status": "error", "msg": "invalid request method used"})
 
 # @app.route('/devices/<mac_address>/logs', methods=['POST'])
 # def device_log_data():
 #     '''Some things to possibly measure'''
     
 #     return 
+
+@app.route('/api/projects', methods=["GET", "POST"])
+def projects():
+    if request.method == "GET":
+        projects = []
+        with app.app_context():
+            conn = dbo.get_db()
+            cursor = conn.cursor()
+
+            projects = dbo.get_all_projects(cursor)
+
+            conn.commit()
+        
+        return jsonify({'status': 'success', 'data': projects})
+    else:
+        return jsonify({"status": "error", "msg": "invalid request method used"})
+
+@app.route('/api/projects/<project_id>', methods=["GET"])
+def project_by_id(project_id):
+    if request.method == "GET":
+        project = {}
+
+        with app.app_context():
+            conn = dbo.get_db()
+            cursor = conn.cursor()
+
+            project = dbo.get_project_by_id(cursor, project_id)
+            
+            conn.commit()
+
+        return jsonify({'status': 'success', 'data': project})
+    else:
+        return jsonify({"status": "error", "msg": "invalid request method used"})
+
+@app.route('/api/projects/<project_id>/devices', methods=["GET"])
+def devices_associated_to_project(project_id):
+    if request.method == "GET":
+        devices = []
+
+        with app.app_context():
+            conn = dbo.get_db()
+            cursor = conn.cursor()
+
+            devices = dbo.get_devices_by_project_id(cursor, project_id)
+            print(devices)
+            
+            conn.commit()
+
+        return jsonify({'status': 'success', 'data': devices})
+    else:
+        return jsonify({"status": "error", "msg": "invalid request method used"})
+
+
 
 @app.route('/api/registered-devices', methods=["GET", "POST"])
 def registered_devices():
@@ -218,20 +332,27 @@ def registered_devices():
     
     elif request.method == "POST":
         return
+    else:
+        return jsonify({"status": "error", "msg": "invalid request method used"})
 
 
 
-@app.route('/dog-tracker/mpu-motion6', methods=['POST'])
+@app.route('/api/device/<device_id>/project/<project_id>/mpu-motion6', methods=['POST'])
 def dog_tracker_motion_data():
+    '''
+    api endpoint for tracking 
+    '''
     try:
         data = request.json  # Assuming the data is sent as JSON
         print(data)
 
-        print(MPU6050_Data(data))
+        # print(MPU6050_Data(data))
 
         # motion_data = MPU6050_Data(**data)
 
         # db.add_dog_motion_data(motion_data)
+
+        
         
         return jsonify({'status': 'success', 'message': 'Data received successfully'})
 

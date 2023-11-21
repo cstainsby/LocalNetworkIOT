@@ -22,25 +22,35 @@ CREATE TABLE IF NOT EXISTS registered_device_table (
     mac_address TEXT PRIMARY KEY,
     device_name TEXT NOT NULL,
     device_type TEXT NOT NULL,
-    device_desc TEXT NOT NULL
+    device_desc TEXT NOT NULL,
+    github_link TEXT
+);
+
+CREATE TABLE IF NOT EXISTS project_table (
+    project_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_name TEXT NOT NULL,
+    project_desc TEXT NOT NULL,
+    created_on TEXT NOT NULL ,
+    github_link TEXT
 );
 
 CREATE TABLE IF NOT EXISTS user_table (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     fname TEXT NOT NULL,
     lname TEXT NOT NULL,
-    user_desc TEXT,
-    identification_num INTEGER NOT NULL
+    user_desc TEXT
 );
 
 CREATE TABLE IF NOT EXISTS device_user_checkout_table (
     checkout_id INTEGER PRIMARY KEY AUTOINCREMENT,
     device_mac_address TEXT NOT NULL,
+    project_id INTEGER, -- allow a device to be optionally checked out under a specific project
     user_id INTEGER NOT NULL,
     start_time TEXT NOT NULL,
     end_time TEXT, 
     FOREIGN KEY (device_mac_address) REFERENCES registered_device_table(mac_address),
-    FOREIGN KEY (user_id) REFERENCES user_table(user_id)
+    FOREIGN KEY (user_id) REFERENCES user_table(user_id),
+    FOREIGN KEY (project_id) REFERENCES project_table(project_id)
 );
 
 CREATE TABLE IF NOT EXISTS mpu6050_data_table (

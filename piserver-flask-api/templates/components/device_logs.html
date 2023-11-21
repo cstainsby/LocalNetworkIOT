@@ -91,7 +91,7 @@
     {% endfor %}
 </ol>
 {% else %}
-    <h3>There is no data which appears to match your query.</h3>
+    <h3>It appears this query is dataless.</h3>
     <img src="{{ url_for('static', filename='media/kermit-the-look.gif') }}" alt="Kermit being mad confused">
 {% endif %}
 </div>  
@@ -103,7 +103,7 @@
     document.getElementById('start-time-input').value = urlParams.get("datetime_from");
     document.getElementById('end-time-input').value = urlParams.get("datetime_to");
     document.getElementById('log-status-code').value = urlParams.get("status_code");
-    document.getElementById('current-checkout-only').value = urlParams.get("curr_checkout_only");
+    // document.getElementById('current-checkout-only').value = urlParams.get("curr_checkout_only");
 
     
 
@@ -181,11 +181,8 @@
                 } else {
                     button.textContent = "More";
                 }
-                console.log(button);
                 let logItem = button.closest(".device-log");
-                console.log(logItem);
                 let additionalInfo = logItem.querySelector(".device-log-content-additional-info");
-                console.log(additionalInfo);
                 let jsonResponse = logItem.querySelector(".device-log-content-json");
                 additionalInfo.classList.toggle('hidden');
                 jsonResponse.classList.toggle('hidden');

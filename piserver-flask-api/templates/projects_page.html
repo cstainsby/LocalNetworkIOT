@@ -1,0 +1,19 @@
+{%extends "base.html" %} 
+{%block content%} 
+    <h1>Projects</h1>
+
+    <ul>
+        {% for project in projects %}
+        <li>
+            <h3>{{ project["title"] }}</h3>
+            <p>Created on: {{ project["created_on"] }}</p>
+            <p>{{ project["desc"] }}</p>
+
+            <div class="project-links">
+                <a href="/projects/{{ project['project_id'] }}" class="nav-link">About</a>
+                <a href="{{ project['github_link'] }}" target=”_blank” class="nav-link">Github</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -10,13 +10,13 @@ INSERT INTO registered_device_table (mac_address, device_name, device_type, devi
 
 
 -- Inserting data into device_user_checkout_table
-INSERT INTO device_user_checkout_table (device_mac_address, user_id, start_time, end_time) VALUES 
-    ('00:11:22:33:44:55', 1, '2023-01-01 12:00:00', '2023-01-01 14:00:00'),
-    ('AA:BB:CC:DD:EE:FF', 2, '2023-01-02 09:30:00', '2023-01-02 11:45:00'),
-    ('11:22:33:44:55:66', 3, '2023-01-03 15:45:00', NULL),
-    ('22:33:44:55:66:77', 1, '2023-01-04 08:00:00', '2023-01-04 10:00:00'),
-    ('33:44:55:66:77:88', 2, '2023-01-05 12:30:00', '2023-01-05 14:45:00'),
-    ('44:55:66:77:88:99', 2, '2023-01-06 16:45:00', NULL);
+INSERT INTO device_user_checkout_table (device_mac_address, user_id, project_id, start_time, end_time) VALUES 
+    ('00:11:22:33:44:55', 1, 1, '2023-01-01 12:00:00', '2023-01-01 14:00:00'),
+    ('AA:BB:CC:DD:EE:FF', 2, NULL, '2023-01-02 09:30:00', '2023-01-02 11:45:00'),
+    ('11:22:33:44:55:66', 3, NULL, '2023-01-03 15:45:00', NULL),
+    ('22:33:44:55:66:77', 1, 1, '2023-01-04 08:00:00', NULL),
+    ('33:44:55:66:77:88', 2, NULL, '2023-01-05 12:30:00', '2023-01-05 14:45:00'),
+    ('44:55:66:77:88:99', 2, NULL, '2023-01-06 16:45:00', NULL);
 
 -- Inserting data into mpu6050_data_table
 INSERT INTO mpu6050_data_table (creation_time, generated_by, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z) VALUES 
@@ -34,32 +34,32 @@ INSERT INTO mpu6050_data_table (creation_time, generated_by, accel_x, accel_y, a
     ('2023-01-05 13:00:00', 'E5:F6:A1:B2:C3:D4', -1.5, 0.2, -1.2, 1.2, -0.7, 0.4);
 
 
-INSERT INTO user_table (fname, lname, user_desc, identification_num)
-SELECT 'John', 'Doe', 'Software Developer', 1
+INSERT INTO user_table (fname, lname, user_desc)
+SELECT 'John', 'Doe', 'Software Developer'
 WHERE NOT EXISTS (
     SELECT 1 FROM user_table 
     WHERE fname = 'John' AND lname = 'Doe'
     LIMIT 1
 );
 
-INSERT INTO user_table (fname, lname, user_desc, identification_num)
-SELECT 'Jane', 'Smith', 'Data Analyst', 2
+INSERT INTO user_table (fname, lname, user_desc)
+SELECT 'Jane', 'Smith', 'Data Analyst'
 WHERE NOT EXISTS (
     SELECT 1 FROM user_table 
     WHERE fname = 'Jane' AND lname = 'Smith'
     LIMIT 1
 );
 
-INSERT INTO user_table (fname, lname, user_desc, identification_num)
-SELECT 'Alice', 'Johnson', 'Database Administrator', 3
+INSERT INTO user_table (fname, lname, user_desc)
+SELECT 'Alice', 'Johnson', 'Database Administrator'
 WHERE NOT EXISTS (
     SELECT 1 FROM user_table 
     WHERE fname = 'Alice' AND lname = 'Johnson'
     LIMIT 1
 );
 
-INSERT INTO user_table (fname, lname, user_desc, identification_num)
-SELECT 'Bob', 'Williams', 'Network Engineer', 4
+INSERT INTO user_table (fname, lname, user_desc)
+SELECT 'Bob', 'Williams', 'Network Engineer'
 WHERE NOT EXISTS (
     SELECT 1 FROM user_table 
     WHERE fname = 'Bob' AND lname = 'Williams'
@@ -85,3 +85,7 @@ VALUES
     ('2023-01-15 19:00:00', 0, '11:22:33:44:55:66', '{"entry_number": 15, "random_value": 0.789}'),
     ('2023-01-16 19:30:00', 0, '22:33:44:55:66:77', '{"entry_number": 16, "random_value": 0.234}');
 
+INSERT INTO project_table (project_name, project_desc, created_on, github_link)
+VALUES 
+    ("Dog Tracker Project", "A fun IOT project to track my dogs movement", '2023-11-21 10:12:00', "https://github.com/cstainsby/DogTracker"),
+    ("Pi Local Server", "A home server hosted on my raspberry pi", '2023-11-21 10:12:00', 'https://github.com/cstainsby/PiLocalNetwork');
