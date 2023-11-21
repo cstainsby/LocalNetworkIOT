@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS project_table (
     project_id INTEGER PRIMARY KEY AUTOINCREMENT,
     project_name TEXT NOT NULL,
     project_desc TEXT NOT NULL,
-    created_on TEXT NOT NULL ,
+    created_on TEXT NOT NULL,
     github_link TEXT
 );
 

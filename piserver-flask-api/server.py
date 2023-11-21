@@ -6,6 +6,11 @@ import json
 from db import PiDatabase
 import server_helpers
 from datatypes import MPU6050_Data
+from datatypes.user import User
+from datatypes.device import Device
+from datatypes.project import Project
+from datatypes.device_checkout import DeviceCheckout
+
 
 DEBUG_MODE = True
 PORT = 8080
@@ -45,6 +50,8 @@ def home():
         cursor = conn.cursor()
 
         checked_out_devices = dbo.get_active_devices_with_user_info(cursor)
+        print(checked_out_devices)
+        # devices = [Device()]
 
         for device in checked_out_devices:
             timestamp_datetime = datetime.strptime(device[3], '%Y-%m-%d %H:%M:%S')
@@ -122,20 +129,22 @@ def project_info_view(project_id):
 
     assocc_devices_list_request = build_request_to_self(f"/api/projects/{project_id}/devices")
     assocc_devices_json_data = requests.get(assocc_devices_list_request).json()
+
+
     
     print(assocc_devices_json_data)
-    # for assocc_device in assocc_devices_json_data["data"]:
-    #     currently_in_use = True if assocc_devices[5] else False 
+    for assocc_device in assocc_devices_json_data["data"]:
+        currently_in_use = True if assocc_devices[5] else False 
 
-    #     assocc_devices.append({
-    #         "in_use": currently_in_use,
-    #         "mac_address": assocc_device[1],
-    #         "device_name": assocc_device[2],
-    #         "device_desc": assocc_device[3],
-    #         "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
-    #         "user_fname": assocc_device[4],
-    #         "user_lname": assocc_device[5]
-    #     })
+        assocc_devices.append({
+            "in_use": currently_in_use,
+            "mac_address": assocc_device[1],
+            "device_name": assocc_device[2],
+            "device_desc": assocc_device[3],
+            "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
+            "user_fname": assocc_device[4],
+            "user_lname": assocc_device[5]
+        })
 
     return render_template("project_info_page.html", project=project, devices=assocc_devices)
 

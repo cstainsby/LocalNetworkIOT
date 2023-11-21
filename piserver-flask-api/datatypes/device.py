@@ -10,29 +10,19 @@ class Device():
     This implementation will be used as a state storage tool to easily store and make common operations
     on data loaded from the database. The intention will be to simplify 
     '''
-    def __init__(self, 
-                device_name: str, 
-                mac_address: str,
-                device_description: str) -> None:
-        self.device_name = device_name
-        self.mac_address = mac_address
-        self.device_description = device_description
-
-        self.start_time
-
-        self.device_checkouts = []
-
-    def is_active() -> bool:
-        return False
-
-    def time_since_start() -> datetime.timedelta:
-        timestamp_datetime = datetime.strptime(self.start_time, '%Y-%m-%d %H:%M:%S')
-        current_time = datetime.now()
-
-        time_dff = current_time - timestamp_datetime
-        # print("time difference " + str(time_dff.days))
-
-        # Extract hours, minutes, and seconds from the time difference
-        days = time_dff.days
-        hours, remainder = divmod(time_dff.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
+    def __init__(self, device_data: dict) -> None:
+        '''
+        Expected input example:
+        {
+            mac_address: TEXT NOT NULL,
+            device_name: TEXT NOT NULL,
+            device_type: TEXT NOT NULL,
+            device_desc: TEXT NOT NULL,
+            github_link: TEXT
+        }
+        '''
+        self.device_name = device_data["device_name"]
+        self.mac_address = device_data["mac_address"]
+        self.device_type = device_data["device_type"]
+        self.device_desc = device_data["device_desc"]
+        self.github_link = device_data["github_link"]
