@@ -4,7 +4,9 @@ from project import Project
 
 class DeviceCheckout():
     def __init__(self, checkout_data) -> None:
-        self.checked_out_to = User
+        self.checked_out_to = User({
+            
+        })
         self.checked_device = Project
 
 

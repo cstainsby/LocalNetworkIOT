@@ -2,14 +2,15 @@ from flask import Flask, request, jsonify, render_template, g
 from datetime import datetime
 import requests
 import json
+import sys
 
 from db import PiDatabase
 import server_helpers
 from datatypes import MPU6050_Data
-from datatypes.user import User
-from datatypes.device import Device
-from datatypes.project import Project
-from datatypes.device_checkout import DeviceCheckout
+# from datatypes.user import User
+# from datatypes.device import Device
+# from datatypes.project import Project
+# from datatypes.device_checkout import DeviceCheckout
 
 
 DEBUG_MODE = True
@@ -374,4 +375,6 @@ def dog_tracker_motion_data():
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
+    # if len(sys.argv) > 1:
+    #     DEBUG_MODE = bool(sys.argv[2])
     app.run(host=HOST, port=PORT, debug=DEBUG_MODE)
