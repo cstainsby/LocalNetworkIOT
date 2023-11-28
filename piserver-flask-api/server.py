@@ -49,9 +49,11 @@ def home():
     devices = []
     projects = []
 
-    # devices_list_request = build_request_to_self("/api/devices")
-    # devices_json_data = requests.get(projects_list_request).json()
+    devices_list_request = build_request_to_self("/api/devices")
+    devices_json_data = requests.get(devices_list_request).json()
     # checked_out_devices = dbo.get_active_devices_with_user_info(cursor)
+
+    print(devices_json_data)
 
 
 
@@ -85,7 +87,12 @@ def home():
     
     for raw_project in projects_json_data["data"]:
         formated_project = Project()
-        formated_project.inflate_from_sqlLite_row(raw_project)
+        formated_project.inflate_from_sqlLite_dict({
+            "title": raw_project[0],
+            "desc": raw_project[1],
+            "created_on": raw_project[2],
+            "github_link": raw_project[3]
+        })
 
         projects.append(formated_project.to_template_data_format())
     
@@ -103,7 +110,12 @@ def all_projects_view():
         for raw_project in projects_json_data["data"]:
 
             formated_project = Project()
-            formated_project.inflate_from_sqlLite_row(raw_project)
+            formated_project.inflate_from_sqlLite_dict({
+                "title": raw_project[0],
+                "desc": raw_project[1],
+                "created_on": raw_project[2],
+                "github_link": raw_project[3]
+            })
 
             projects.append(formated_project.to_template_data_format())
 
@@ -121,28 +133,28 @@ def project_info_view(project_name: str):
     raw_project = projects_json_data["data"]
 
     formated_project = Project()
-    formated_project.inflate_from_sqlLite_row(raw_project)
+    formated_project.inflate_from_sqlLite_dict({
+        "title": raw_project[0],
+        "desc": raw_project[1],
+        "created_on": raw_project[2],
+        "github_link": raw_project[3]
+    })
 
 
     # devices
-    # assocc_devices_list_request = build_request_to_self(f"/api/projects/{project_name}/devices")
-    # assocc_devices_json_data = requests.get(assocc_devices_list_request).json()
+    assocc_devices_list_request = build_request_to_self(f"/api/projects/{project_name}/devices")
+    assocc_devices_json_data = requests.get(assocc_devices_list_request).json()
 
-    # for raw_assocc_device in assocc_devices_json_data["data"]:
-    #     print 
-    #     print(raw_assocc_device)
-    #     currently_in_use = True if assocc_devices[5] else False 
+    for raw_assocc_device in assocc_devices_json_data["data"]:
+        formated_device = Device()
+        formated_device.inflate_from_sqlLite_dict({
+            "mac_address": raw_assocc_device[0],
+            "name": raw_assocc_device[1],
+            "type": raw_assocc_device[2],
+            "desc": raw_assocc_device[3],
+        })
 
-        # assocc_devices.append({
-        #     "in_use": currently_in_use,
-        #     "mac_address": assocc_device[1],
-        #     "device_name": assocc_device[2],
-        #     "device_desc": assocc_device[3],
-        #     "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
-        #     "user_fname": assocc_device[4],
-        #     "user_lname": assocc_device[5]
-        # })
-
+        assocc_devices.append(formated_device.to_template_data_format())
 
 
     return render_template("project_info_page.html", project=formated_project.to_template_data_format(), devices=assocc_devices)
@@ -157,7 +169,12 @@ def device_view():
 
     for raw_device in devices_json_data["data"]:
         formated_device = Device()
-        formated_device.inflate_from_sqlLite_row(raw_device)
+        formated_device.inflate_from_sqlLite_dict({
+            "mac_address": raw_device[0],
+            "name": raw_device[1],
+            "type": raw_device[2],
+            "desc": raw_device[3],
+        })
 
         devices.append(formated_device.to_template_data_format())
 
@@ -352,7 +369,6 @@ def devices_associated_to_project(project_name):
             cursor = conn.cursor()
 
             devices = dbo.get_devices_by_project_name(cursor, project_name)
-            print(devices)
             
             conn.commit()
 
@@ -369,7 +385,6 @@ def dog_tracker_motion_data(mac_address, project_name):
     '''
     try:
         data = request.json  # Assuming the data is sent as JSON
-        print(data)
 
         # print(MPU6050_Data(data))
 

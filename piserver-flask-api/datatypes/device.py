@@ -1,5 +1,8 @@
 from datetime import datetime
 import datetime
+from typing import List
+
+from .device_checkout import DeviceCheckout
 
 class Device():
     '''
@@ -27,12 +30,21 @@ class Device():
         self.desc = ""
         self.github_link = None
 
-    def inflate_from_sqlLite_row(self, data: list):
-        self.mac_address = data[0]
-        self.name = data[1]
-        self.type = data[2]
-        self.desc = data[3]
-        self.github_link = data[4] if data[4] != "None" else None
+        self.checkouts: List[DeviceCheckout] = [] # instances where the device has been used
+    
+
+
+    def inflate_from_sqlLite_dict(self, data: dict):
+        self.mac_address = data["mac_address"]
+        self.name = data["name"]
+        self.type = data["type"]
+        self.desc = data["desc"]
+        self.github_link = data["github_link"] if "github_link" in data else None
+
+        if "checkouts" in data:
+            raw_checkouts = data["checkouts"]
+            formated_checkout = DeviceCheckout()
+            formated_checkout.inflate_from_sqlLite_dict(raw_checkouts)
     
     def to_template_data_format(self) -> dict:
         template_data = {

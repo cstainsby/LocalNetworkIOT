@@ -1,13 +1,31 @@
 {%extends "base.html" %} 
 {%block content%} 
     <h1>Project - {{ project["title"] }}</h1>
-    <p>Created On: {{ project["creation_date"] }}</p>
+    <p>Created On: {{ project["created_on"] }}</p>
     <p>{{ project["desc"] }}</p>
 
     <h3>Connected Devices</h3>
     <p>A list of all contributing devices ordered by last contribute date.</p>
     <p>Each device will have a list of checkouts associated with this project allowing easy access to </p>
 
+    <div class="assocc-device-list">
+        {% for device in devices %}
+            {% include 'components/device_snippet.html' %}
+        {% endfor %}
+    </div>
 
     {% include 'components/device_logs.html' %}
+
+    <style>
+        .assocc-device-list {
+            display: flex;
+            flex-direction: row;
+        }
+        .assocc-device-list > * {
+            background-color: lightgrey;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 4px;
+        }
+    </style>
 {% endblock %}

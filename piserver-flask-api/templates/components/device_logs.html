@@ -1,25 +1,14 @@
 
 <div class="logs-page">
-<h1>Device Logs</h1>
+<h2>Device Logs</h2>
 
 <div class="logs-header">
-    <div class="logs-informational">
-        Each log will be labeled with a code which describes the content within, and will make filtering through types of logs possible.
-        These codes include:
-        <ol>
-            <li>Informational</li>
-            <li>Error</li>
-            <li>Success</li>
-        </ol>
-    </div>
-
-
     <form id="filterForm">
         <label for="device-addr-input">Select Device:</label>
         <select id="device-addr-input" onchange="deviceIdSelectChange()">
             <option value="">--</option>
             {% for device in devices %}
-                <option value="{{ device['mac_address'] }}">{{ device["device_name"] }} - {{ device['mac_address'] }}</option>
+                <option value="{{ device['mac_address'] }}">{{ device["name"] }} - {{ device['mac_address'] }}</option>
             {% endfor %}
         </select> 
 
@@ -45,56 +34,135 @@
 
         <button type="button" onclick="applySearchFilter()">Filter</button>
     </form>
+
+    <div class="logs-informational">
+        Each log will be labeled with a code which describes the content within, and will make filtering through types of logs possible.
+        These codes include:
+        <ol>
+            <li>Informational</li>
+            <li>Error</li>
+            <li>Success</li>
+        </ol>
+    </div>
+</div>
+
+<div class="logs-container">
+    {% if logs %}
+    <ol class="log-list">
+        {% for log in logs %}
+            <li class="device-log">
+                <!-- <div class="device-log-metainfo">
+                    
+                </div> -->
+                <button class="device-log-toggle-button">More</button>
+                <div class="device-log-device-identifier">
+                    <h3>{{ log["device_name"] }}</h3>
+                    <p> - {{ log["mac_address"] }}</p>
+                </div>
+                <p class="device-log-status-message"
+                    {% if log['status_code'] == '0' %} 
+                        style="color: #2980b9;" 
+                    {% elif log['status_code'] == '1' %}
+                        style="color: #c0392b;"
+                    {% elif log['status_code'] == '2' %}
+                        style="color: #27ae60;"
+                    {% endif %}>
+                    {{ log["log_descriptor"] }}
+                </p>
+                <p class="device-log-creation-datetime">Created At: <b>{{ log["creation_time"] }}</b></p>
+
+
+                <!-- <div class="device-log-content hidden">
+                </div> -->
+                <div class="device-log-content-additional-info hidden">
+                    <h4>Additional Info</h4>
+                    <p>Device Type - {{ log["device_type"] }} </p>
+                    <p>Used By - <a href="/devices/checkout/{{ log['checkout_id'] }}">
+                        {{ log["user_fname"] }} {{ log["user_lname"] }}
+                        #{{ log["checkout_id"] }}
+                    </a></p>
+                </div>
+                <div class="device-log-content-json hidden">
+                    <h4>Json Response:</h4>
+                    <pre>{{ log["log_data"] | tojson_pretty | safe }}</pre>
+                </div>
+            </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+        <h3>It appears this query is dataless.</h3>
+        <img src="{{ url_for('static', filename='media/kermit-the-look.gif') }}" alt="Kermit being mad confused">
+    {% endif %}
+    </div>  
 </div>
 
 
-{% if logs %}
-<ol class="log-list">
-    {% for log in logs %}
-        <li class="device-log">
-            <!-- <div class="device-log-metainfo">
-                
-            </div> -->
-            <button class="device-log-toggle-button">More</button>
-            <div class="device-log-device-identifier">
-                <h3>{{ log["device_name"] }}</h3>
-                <p> - {{ log["mac_address"] }}</p>
-            </div>
-            <p class="device-log-status-message"
-                {% if log['status_code'] == '0' %} 
-                    style="color: #2980b9;" 
-                {% elif log['status_code'] == '1' %}
-                    style="color: #c0392b;"
-                {% elif log['status_code'] == '2' %}
-                    style="color: #27ae60;"
-                {% endif %}>
-                {{ log["log_descriptor"] }}
-            </p>
-            <p class="device-log-creation-datetime">Created At: <b>{{ log["creation_time"] }}</b></p>
+<style>
+    /* .logs-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    } */
+    .logs-header {
+        display: flex;
+        flex-direction: row;
+    }
+    .logs-informational {
+        margin: 8px;
+    }
+    #filterForm {
+        display: flex;
+        flex-direction: column;
+        margin: 8px;
+    }
 
+    .logs-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .log-list {
+        width: 80%;
+    }
+    .device-log {
+        padding: 8px;
+        margin: 4px;
+        background-color: lightgray;
+        border-radius: 4px;
 
-            <!-- <div class="device-log-content hidden">
-            </div> -->
-            <div class="device-log-content-additional-info hidden">
-                <h4>Additional Info</h4>
-                <p>Device Type - {{ log["device_type"] }} </p>
-                <p>Used By - <a href="/devices/checkout/{{ log['checkout_id'] }}">
-                    {{ log["user_fname"] }} {{ log["user_lname"] }}
-                    #{{ log["checkout_id"] }}
-                </a></p>
-            </div>
-            <div class="device-log-content-json hidden">
-                <h4>Json Response:</h4>
-                <pre>{{ log["log_data"] | tojson_pretty | safe }}</pre>
-            </div>
-        </li>
-    {% endfor %}
-</ol>
-{% else %}
-    <h3>It appears this query is dataless.</h3>
-    <img src="{{ url_for('static', filename='media/kermit-the-look.gif') }}" alt="Kermit being mad confused">
-{% endif %}
-</div>  
+        display: grid;
+        grid-template-areas: 
+            "device-id status-msg creation-datetime toggle-button"
+            "additional-info json-response json-response json-response"; 
+        grid-template-columns: 0.5fr 1fr 1fr 0.1fr;
+        align-items: center;
+    }
+
+    .device-log-device-identifier {
+        display: flex;
+        flex-direction: row;
+        align-items: center; 
+        
+        grid-area: device-id;
+    }
+    .device-log-status-message { 
+        grid-area: status-msg;
+    }
+    .device-log-toggle-button { 
+        grid-area: toggle-button;
+    }
+    .device-log-creation-datetime { 
+        grid-area: creation-datetime;
+    }
+
+    .device-log-content-json {
+        grid-area: json-response;
+    }
+    .device-log-content-additional-info {
+        grid-area: additional-info;
+    }
+</style>
 
 
 <script>

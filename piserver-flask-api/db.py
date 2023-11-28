@@ -153,7 +153,7 @@ class PiDatabase():
         db_cursor.execute(f'''
             SELECT * 
             FROM project_table
-            WHERE project_name = {project_name}
+            WHERE project_name = '{project_name}'
         ''')
         return db_cursor.fetchone()
     
@@ -163,8 +163,9 @@ class PiDatabase():
         '''
         db_cursor.execute(f'''
             SELECT * 
-            FROM device_user_checkout_table
-            WHERE project_name = {project_name}
+            FROM registered_device_table dev 
+                JOIN device_user_checkout_table checkout ON (dev.mac_address = checkout.device_mac_address)
+            WHERE project_name = '{project_name}'
         ''')
         return db_cursor.fetchall()
 

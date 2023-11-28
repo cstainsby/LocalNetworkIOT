@@ -17,11 +17,11 @@ class Project():
         self.created_on = ""
         self.github_link = None
     
-    def inflate_from_sqlLite_row(self, data: list):
-        self.title = data[0]
-        self.desc = data[1]
-        self.created_on = data[2]
-        self.github_link = data[3]
+    def inflate_from_sqlLite_dict(self, data: dict):
+        self.title = data["title"] 
+        self.desc = data["desc"] 
+        self.created_on = data["created_on"] 
+        self.github_link = data["github_link"] if "github_link" in data else None
     
     def to_template_data_format(self) -> dict:
         template_data = {
