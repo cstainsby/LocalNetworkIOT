@@ -3,15 +3,24 @@
 
 <div class="listed-device">
     <div class="listed-device-title">
-        <h4>{{ device["device_name"] }}</h4>
-        <span>Active For: {{ device["time_since_start"] }}</span>
+        <h4>{{ device["name"] }}</h4>
+        <p><b>MAC Address:</b> {{ device["mac_address"] }}</p>
     </div>
-    <p>Checked Out To: {{ device['user_fname'] }} {{ device['user_lname'] }}</p>
+    <p><b>Device Type:</b> {{ device["type"]}}</p>
+
+    {% if "time_since_start" in device %}
+        <p>Active For: {{ device["time_since_start"] }}</p>
+        <p>Checked Out To: {{ device['user_fname'] }} {{ device['user_lname'] }}</p>
+    {% endif %}
     <!-- <p>Requests per minute: </p>
     <p>Errors Encountered: </p> -->
     
     <div class="nav-buttons">
         <a href="/devices/logs?device_addr={{ device['mac_address'] }}" class="nav-link">Current Logs</a>
+
+        {% if "github_link" in device %}
+            <a href="{{ device['github_link']}}" target=”_blank” class="nav-link">Github</a>
+        {% endif %}
         <!-- <a>Past Activity</a> -->
     </div>
 </div>

@@ -2,13 +2,13 @@
 
 <div class="project-snippet">
     <div class="listed-device-title">
-        <h4>{{ project["project_title"] }}</h4>
+        <h4>{{ project["title"] }}</h4>
         <span>Created On: {{ project["creation_date"] }}</span>
     </div>
-    <p>{{ project["project_desc"] }}</p>
+    <p>{{ project["desc"] }}</p>
     
     <div class="nav-buttons">
-        <a href="/projects/{{ project['project_id'] }}" class="nav-link">Info</a>
+        <a href="/projects/{{ project['title'] }}" class="nav-link">Info</a>
         <a href="{{ project['github_link']}}" target=”_blank” class="nav-link">Github</a>
     </div>
 </div>

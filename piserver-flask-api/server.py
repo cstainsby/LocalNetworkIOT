@@ -6,7 +6,10 @@ import sys
 
 from db import PiDatabase
 import server_helpers
-from datatypes import MPU6050_Data
+# from datatypes import MPU6050_Data
+from datatypes.project import Project
+from datatypes.device import Device
+from datatypes.device_checkout import DeviceCheckout
 # from datatypes.user import User
 # from datatypes.device import Device
 # from datatypes.project import Project
@@ -46,48 +49,46 @@ def home():
     devices = []
     projects = []
 
-    with app.app_context():
-        conn = dbo.get_db()
-        cursor = conn.cursor()
+    # devices_list_request = build_request_to_self("/api/devices")
+    # devices_json_data = requests.get(projects_list_request).json()
+    # checked_out_devices = dbo.get_active_devices_with_user_info(cursor)
 
-        checked_out_devices = dbo.get_active_devices_with_user_info(cursor)
-        print(checked_out_devices)
-        # devices = [Device()]
 
-        for device in checked_out_devices:
-            timestamp_datetime = datetime.strptime(device[3], '%Y-%m-%d %H:%M:%S')
-            current_time = datetime.now()
 
-            time_dff = current_time - timestamp_datetime
-            # print("time difference " + str(time_dff.days))
 
-            # Extract hours, minutes, and seconds from the time difference
-            days = time_dff.days
-            hours, remainder = divmod(time_dff.seconds, 3600)
-            minutes, seconds = divmod(remainder, 60)
+    # # devices = [Device()]
 
-            devices.append({
-                "in_use": True,
-                "mac_address": device[0],
-                "device_name": device[1],
-                "device_desc": device[2],
-                "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
-                "user_fname": device[4],
-                "user_lname": device[5]
-            })
+    # for device in checked_out_devices:
+    #     timestamp_datetime = datetime.strptime(device[3], '%Y-%m-%d %H:%M:%S')
+    #     current_time = datetime.now()
 
-        raw_projects = dbo.get_all_projects(cursor)
-        
-        for raw_project in raw_projects:
-            projects.append({
-                "project_id": raw_project[0],
-                "project_title": raw_project[1],
-                "project_desc": raw_project[2],
-                "creation_date": raw_project[3],
-                "github_link": raw_project[4] 
-            })
-        
-        conn.commit()
+    #     time_dff = current_time - timestamp_datetime
+    #     # print("time difference " + str(time_dff.days))
+
+    #     # Extract hours, minutes, and seconds from the time difference
+    #     days = time_dff.days
+    #     hours, remainder = divmod(time_dff.seconds, 3600)
+    #     minutes, seconds = divmod(remainder, 60)
+
+    #     devices.append({
+    #         "in_use": True,
+    #         "mac_address": device[0],
+    #         "device_name": device[1],
+    #         "device_desc": device[2],
+    #         "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
+    #         "user_fname": device[4],
+    #         "user_lname": device[5]
+    #     })
+
+    projects_list_request = build_request_to_self("/api/projects")
+    projects_json_data = requests.get(projects_list_request).json()
+    
+    for raw_project in projects_json_data["data"]:
+        formated_project = Project()
+        formated_project.inflate_from_sqlLite_row(raw_project)
+
+        projects.append(formated_project.to_template_data_format())
+    
 
     return render_template('home_dashboard.html', devices=devices, projects=projects)
 
@@ -99,59 +100,73 @@ def all_projects_view():
     projects_json_data = requests.get(projects_list_request).json()
 
     if projects_json_data["status"] == "success": 
-        for project in projects_json_data["data"]:
+        for raw_project in projects_json_data["data"]:
 
-            projects.append({
-                "project_id": project[0],
-                "title": project[1],
-                "desc": project[2],
-                "created_on": project[3],
-                "github_link": project[4]
-            })
+            formated_project = Project()
+            formated_project.inflate_from_sqlLite_row(raw_project)
+
+            projects.append(formated_project.to_template_data_format())
 
     return render_template('projects_page.html', projects=projects)
 
-@app.route('/projects/<project_id>', methods=["GET"])
-def project_info_view(project_id):
+@app.route('/projects/<project_name>', methods=["GET"])
+def project_info_view(project_name: str):
     project = {}
     assocc_devices = []
     contributors = []
 
-    projects_list_request = build_request_to_self(f"/api/projects/{project_id}")
+    # projects
+    projects_list_request = build_request_to_self(f"/api/projects/{project_name}")
     projects_json_data = requests.get(projects_list_request).json()
+    raw_project = projects_json_data["data"]
 
-    project = {
-        "project_id": projects_json_data["data"][0],
-        "title": projects_json_data["data"][1],
-        "desc": projects_json_data["data"][2],
-        "created_on": projects_json_data["data"][3],
-        "github_link": projects_json_data["data"][4]
-    }
-
-    assocc_devices_list_request = build_request_to_self(f"/api/projects/{project_id}/devices")
-    assocc_devices_json_data = requests.get(assocc_devices_list_request).json()
+    formated_project = Project()
+    formated_project.inflate_from_sqlLite_row(raw_project)
 
 
-    
-    print(assocc_devices_json_data)
-    for assocc_device in assocc_devices_json_data["data"]:
-        currently_in_use = True if assocc_devices[5] else False 
+    # devices
+    # assocc_devices_list_request = build_request_to_self(f"/api/projects/{project_name}/devices")
+    # assocc_devices_json_data = requests.get(assocc_devices_list_request).json()
 
-        assocc_devices.append({
-            "in_use": currently_in_use,
-            "mac_address": assocc_device[1],
-            "device_name": assocc_device[2],
-            "device_desc": assocc_device[3],
-            "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
-            "user_fname": assocc_device[4],
-            "user_lname": assocc_device[5]
-        })
+    # for raw_assocc_device in assocc_devices_json_data["data"]:
+    #     print 
+    #     print(raw_assocc_device)
+    #     currently_in_use = True if assocc_devices[5] else False 
 
-    return render_template("project_info_page.html", project=project, devices=assocc_devices)
+        # assocc_devices.append({
+        #     "in_use": currently_in_use,
+        #     "mac_address": assocc_device[1],
+        #     "device_name": assocc_device[2],
+        #     "device_desc": assocc_device[3],
+        #     "time_since_start": (f"{days} days, " if days > 0 else "") + f"{hours} hrs, {minutes} minutes",
+        #     "user_fname": assocc_device[4],
+        #     "user_lname": assocc_device[5]
+        # })
+
+
+
+    return render_template("project_info_page.html", project=formated_project.to_template_data_format(), devices=assocc_devices)
+
+
+@app.route('/devices', methods=["GET"])
+def device_view():
+    devices = []
+
+    devices_list_request = build_request_to_self(f"/api/devices")
+    devices_json_data = requests.get(devices_list_request).json()
+
+    for raw_device in devices_json_data["data"]:
+        formated_device = Device()
+        formated_device.inflate_from_sqlLite_row(raw_device)
+
+        devices.append(formated_device.to_template_data_format())
+
+    return render_template('devices_page.html', devices=devices)
+
 
 
 @app.route('/devices/<mac_address>', methods=['GET'])
-def device_view(mac_address: str):
+def specific_device_view(mac_address: str):
     data = {}
 
     
@@ -210,7 +225,7 @@ def device_log_view():
         })
     
     # get all devices 
-    devices_request_endpoint = build_request_to_self("/api/registered-devices")
+    devices_request_endpoint = build_request_to_self("/api/devices")
     device_json_data = requests.get(devices_request_endpoint).json()
 
     for device in device_json_data["data"]:
@@ -233,6 +248,28 @@ def checkout_view(checkout_id):
 @app.route('/ping', methods=['GET'])
 def ping():
     return 'Hello from Python server!\n'
+
+
+@app.route('/api/devices', methods=["GET", "POST"])
+def devices_api():
+    if request.method == "GET":
+        devices = []
+
+        with app.app_context():
+            conn = dbo.get_db()
+            cursor = conn.cursor()
+
+            devices = dbo.get_all_devices(cursor)
+            
+            conn.commit()
+
+        return jsonify({'status': 'success', 'data': devices})
+    
+    elif request.method == "POST":
+        return
+    else:
+        return jsonify({"status": "error", "msg": "invalid request method used"})
+
 
 
 @app.route('/api/devices/logs', methods=["GET", "POST"])
@@ -288,8 +325,8 @@ def projects():
     else:
         return jsonify({"status": "error", "msg": "invalid request method used"})
 
-@app.route('/api/projects/<project_id>', methods=["GET"])
-def project_by_id(project_id):
+@app.route('/api/projects/<project_name>', methods=["GET"])
+def project_by_name(project_name):
     if request.method == "GET":
         project = {}
 
@@ -297,7 +334,7 @@ def project_by_id(project_id):
             conn = dbo.get_db()
             cursor = conn.cursor()
 
-            project = dbo.get_project_by_id(cursor, project_id)
+            project = dbo.get_project_by_name(cursor, project_name)
             
             conn.commit()
 
@@ -305,8 +342,8 @@ def project_by_id(project_id):
     else:
         return jsonify({"status": "error", "msg": "invalid request method used"})
 
-@app.route('/api/projects/<project_id>/devices', methods=["GET"])
-def devices_associated_to_project(project_id):
+@app.route('/api/projects/<project_name>/devices', methods=["GET"])
+def devices_associated_to_project(project_name):
     if request.method == "GET":
         devices = []
 
@@ -314,7 +351,7 @@ def devices_associated_to_project(project_id):
             conn = dbo.get_db()
             cursor = conn.cursor()
 
-            devices = dbo.get_devices_by_project_id(cursor, project_id)
+            devices = dbo.get_devices_by_project_name(cursor, project_name)
             print(devices)
             
             conn.commit()
@@ -325,30 +362,8 @@ def devices_associated_to_project(project_id):
 
 
 
-@app.route('/api/registered-devices', methods=["GET", "POST"])
-def registered_devices():
-    if request.method == "GET":
-        devices = []
-
-        with app.app_context():
-            conn = dbo.get_db()
-            cursor = conn.cursor()
-
-            devices = dbo.get_all_devices(cursor)
-            
-            conn.commit()
-
-        return jsonify({'status': 'success', 'data': devices})
-    
-    elif request.method == "POST":
-        return
-    else:
-        return jsonify({"status": "error", "msg": "invalid request method used"})
-
-
-
-@app.route('/api/device/<device_id>/project/<project_id>/mpu-motion6', methods=['POST'])
-def dog_tracker_motion_data():
+@app.route('/api/device/<mac_address>/project/<project_name>/mpu-motion6', methods=['POST'])
+def dog_tracker_motion_data(mac_address, project_name):
     '''
     api endpoint for tracking 
     '''

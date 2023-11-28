@@ -10,11 +10,11 @@ INSERT INTO registered_device_table (mac_address, device_name, device_type, devi
 
 
 -- Inserting data into device_user_checkout_table
-INSERT INTO device_user_checkout_table (device_mac_address, user_id, project_id, start_time, end_time) VALUES 
-    ('00:11:22:33:44:55', 1, 1, '2023-01-01 12:00:00', '2023-01-01 14:00:00'),
+INSERT INTO device_user_checkout_table (device_mac_address, user_id, project_name, start_time, end_time) VALUES 
+    ('00:11:22:33:44:55', 1, "dogTrackerProject", '2023-01-01 12:00:00', '2023-01-01 14:00:00'),
     ('AA:BB:CC:DD:EE:FF', 2, NULL, '2023-01-02 09:30:00', '2023-01-02 11:45:00'),
     ('11:22:33:44:55:66', 3, NULL, '2023-01-03 15:45:00', NULL),
-    ('22:33:44:55:66:77', 1, 1, '2023-01-04 08:00:00', NULL),
+    ('22:33:44:55:66:77', 1, "dogTrackerProject", '2023-01-04 08:00:00', NULL),
     ('33:44:55:66:77:88', 2, NULL, '2023-01-05 12:30:00', '2023-01-05 14:45:00'),
     ('44:55:66:77:88:99', 2, NULL, '2023-01-06 16:45:00', NULL);
 
@@ -87,5 +87,5 @@ VALUES
 
 INSERT INTO project_table (project_name, project_desc, created_on, github_link)
 VALUES 
-    ("Dog Tracker Project", "A fun IOT project to track my dogs movement", '2023-11-21 10:12:00', "https://github.com/cstainsby/DogTracker"),
-    ("Pi Local Server", "A home server hosted on my raspberry pi", '2023-11-21 10:12:00', 'https://github.com/cstainsby/PiLocalNetwork');
+    ("dogTrackerProject", "A fun IOT project to track my dogs movement", '2023-11-21 10:12:00', "https://github.com/cstainsby/DogTracker"),
+    ("piLocalServer", "A home server hosted on my raspberry pi", '2023-11-21 10:12:00', 'https://github.com/cstainsby/PiLocalNetwork');

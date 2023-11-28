@@ -3,7 +3,6 @@ import sqlite3
 from sqlite3 import Connection, Cursor
 import os
 
-from datatypes import MPU6050_Data
 
 class PiDatabase():
     def __init__(self, debug_mode=False) -> None:
@@ -150,26 +149,26 @@ class PiDatabase():
         ''')
         return db_cursor.fetchall()
 
-    def get_project_by_id(self, db_cursor: Cursor, project_id: int):
+    def get_project_by_name(self, db_cursor: Cursor, project_name: str):
         db_cursor.execute(f'''
             SELECT * 
             FROM project_table
-            WHERE project_id = {project_id}
+            WHERE project_name = {project_name}
         ''')
         return db_cursor.fetchone()
     
-    def get_devices_by_project_id(self, db_cursor: Cursor, project_id: int):
+    def get_devices_by_project_name(self, db_cursor: Cursor, project_name: str):
         '''
         Get all devices associated with a project
         '''
         db_cursor.execute(f'''
             SELECT * 
             FROM device_user_checkout_table
-            WHERE project_id = {project_id}
+            WHERE project_name = {project_name}
         ''')
         return db_cursor.fetchall()
 
-    def add_dog_motion_data(self, db_cursor: Cursor, data: MPU6050_Data):
+    def add_dog_motion_data(self, db_cursor: Cursor, data):
         db_cursor.execute('''
             INSERT INTO motion_data (accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z)
             VALUES (?, ?, ?, ?, ?, ?)

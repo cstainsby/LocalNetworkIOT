@@ -10,7 +10,7 @@ class Device():
     This implementation will be used as a state storage tool to easily store and make common operations
     on data loaded from the database. The intention will be to simplify 
     '''
-    def __init__(self, device_data: dict) -> None:
+    def __init__(self) -> None:
         '''
         Expected input example:
         {
@@ -21,8 +21,27 @@ class Device():
             github_link: TEXT
         }
         '''
-        self.device_name = device_data["device_name"]
-        self.mac_address = device_data["mac_address"]
-        self.device_type = device_data["device_type"]
-        self.device_desc = device_data["device_desc"]
-        self.github_link = device_data["github_link"]
+        self.name = ""
+        self.mac_address = ""
+        self.type = ""
+        self.desc = ""
+        self.github_link = None
+
+    def inflate_from_sqlLite_row(self, data: list):
+        self.mac_address = data[0]
+        self.name = data[1]
+        self.type = data[2]
+        self.desc = data[3]
+        self.github_link = data[4] if data[4] != "None" else None
+    
+    def to_template_data_format(self) -> dict:
+        template_data = {
+            "name": self.name,
+            "mac_address": self.mac_address,
+            "desc": self.desc,
+            "type": self.type
+        }
+        if self.github_link:
+            template_data["github_link"] = self.github_link
+
+        return template_data

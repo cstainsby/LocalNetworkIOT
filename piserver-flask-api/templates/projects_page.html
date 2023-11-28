@@ -6,12 +6,14 @@
         {% for project in projects %}
         <li>
             <h3>{{ project["title"] }}</h3>
-            <p>Created on: {{ project["created_on"] }}</p>
+            <p>Created on: {{ project["creation_date"] }}</p>
             <p>{{ project["desc"] }}</p>
 
             <div class="project-links">
-                <a href="/projects/{{ project['project_id'] }}" class="nav-link">About</a>
-                <a href="{{ project['github_link'] }}" target=”_blank” class="nav-link">Github</a>
+                <a href="/projects/{{ project['title'] }}" class="nav-link">About</a>
+                {% if project['github_link'] %}
+                    <a href="{{ project['github_link'] }}" target=”_blank” class="nav-link">Github</a>
+                {% endif %}
             </div>
         </li>
         {% endfor %}

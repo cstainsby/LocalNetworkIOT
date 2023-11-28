@@ -1,21 +1,36 @@
 
 class Project():
-    def __init__(self, project_data: dict) -> None:
+    def __init__(self) -> None:
         '''
         Parse an instance of user json for data 
 
         Expected input example:
         {
-            project_id:   INTEGER NOT NULL,
-            project_name: TEXT NOT NULL,
+            project_name: TEXT PRIMARY KEY,
             project_desc: TEXT NOT NULL,
             created_on:   TEXT NOT NULL,
             github_link:  TEXT
         } 
         '''
-        self.project_id = project_data["project_data"]
-        self.project_name = project_data["project_name"]
-        self.project_desc = project_data["project_desc"]
-        self.created_on = project_data["created_on"]
-        self.github_link = project_data["github_link"] if "github_link" in project_data else ""
+        self.title = ""
+        self.desc = ""
+        self.created_on = ""
+        self.github_link = None
+    
+    def inflate_from_sqlLite_row(self, data: list):
+        self.title = data[0]
+        self.desc = data[1]
+        self.created_on = data[2]
+        self.github_link = data[3]
+    
+    def to_template_data_format(self) -> dict:
+        template_data = {
+            "title": self.title,
+            "desc": self.desc,
+            "created_on": self.created_on,
+        }
+        if self.github_link:
+            template_data["github_link"] = self.github_link
+
+        return template_data
 

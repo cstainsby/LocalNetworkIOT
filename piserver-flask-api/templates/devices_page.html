@@ -1,0 +1,11 @@
+
+{%extends "base.html" %} 
+{%block content%} 
+    <h2>Devices</h2>
+
+    {% for device in devices%}
+        {% with device=device %}
+        {% include 'components/device_snippet.html' %}
+        {% endwith %}
+    {% endfor %}
+{% endblock %}
