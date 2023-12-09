@@ -1,4 +1,9 @@
 
+INSERT INTO project_table (project_name, project_desc, created_on, github_link)
+VALUES 
+    ("dogTrackerProject", "A fun IOT project to track my dogs movement", '2023-11-21 10:12:00', "https://github.com/cstainsby/DogTracker"),
+    ("piLocalServer", "A home server hosted on my raspberry pi", '2023-11-21 10:12:00', 'https://github.com/cstainsby/PiLocalNetwork');
+
 -- Inserting data into registered_device_table
 INSERT INTO registered_device_table (mac_address, device_name, device_type, device_desc) VALUES 
     ('00:11:22:33:44:55', 'Device1', 'MPU6050', 'Description for Device1'),
@@ -10,28 +15,34 @@ INSERT INTO registered_device_table (mac_address, device_name, device_type, devi
 
 
 -- Inserting data into device_user_checkout_table
-INSERT INTO device_user_checkout_table (device_mac_address, user_id, project_name, start_time, end_time) VALUES 
-    ('00:11:22:33:44:55', 1, "dogTrackerProject", '2023-01-01 12:00:00', '2023-01-01 14:00:00'),
-    ('AA:BB:CC:DD:EE:FF', 2, NULL, '2023-01-02 09:30:00', '2023-01-02 11:45:00'),
-    ('11:22:33:44:55:66', 3, NULL, '2023-01-03 15:45:00', NULL),
-    ('22:33:44:55:66:77', 1, "dogTrackerProject", '2023-01-04 08:00:00', NULL),
-    ('33:44:55:66:77:88', 2, NULL, '2023-01-05 12:30:00', '2023-01-05 14:45:00'),
-    ('44:55:66:77:88:99', 2, NULL, '2023-01-06 16:45:00', NULL);
+-- INSERT INTO device_user_checkout_table (device_mac_address, user_id, project_name, start_time, end_time) VALUES 
+--     ('00:11:22:33:44:55', 1, "dogTrackerProject", '2023-01-01 12:00:00', '2023-01-01 14:00:00'),
+--     ('AA:BB:CC:DD:EE:FF', 2, NULL, '2023-01-02 09:30:00', '2023-01-02 11:45:00'),
+--     ('11:22:33:44:55:66', 3, NULL, '2023-01-03 15:45:00', NULL),
+--     ('22:33:44:55:66:77', 1, "dogTrackerProject", '2023-01-04 08:00:00', NULL),
+--     ('33:44:55:66:77:88', 2, NULL, '2023-01-05 12:30:00', '2023-01-05 14:45:00'),
+--     ('44:55:66:77:88:99', 2, NULL, '2023-01-06 16:45:00', NULL);
+
+INSERT INTO device_recording_table (recording_name, device_checked_out, user_id, start_time) VALUES
+    ('Test Recording', '00:11:22:33:44:55', 1, '2023-01-01 08:00:00');
+
+INSERT INTO project_recording_table (project_name, recording_id) VALUES
+    ('dogTrackerProject', 1);
 
 -- Inserting data into mpu6050_data_table
-INSERT INTO mpu6050_data_table (creation_time, generated_by, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z) VALUES 
-    ('2023-01-01 08:00:00', '00:11:22:33:44:55', 0.5, -1.2, 2.0, 0.1, -0.8, 0.5),
-    ('2023-01-01 09:15:00', 'AA:BB:CC:DD:EE:FF', 1.2, 0.8, -0.3, -0.2, 0.7, -0.4),
-    ('2023-01-01 10:30:00', '11:22:33:44:55:66', -0.3, 0.5, 1.8, 1.0, -1.5, 0.9),
-    ('2023-01-02 08:30:00', '00:11:22:33:44:55', 0.8, -1.5, 2.5, -0.3, -0.9, 0.7),
-    ('2023-01-02 09:45:00', 'AA:BB:CC:DD:EE:FF', 1.5, 0.3, -0.8, -0.5, 0.6, -0.1),
-    ('2023-01-03 12:45:00', '11:22:33:44:55:66', -1.0, 0.8, 1.2, 0.9, -1.2, 1.1),
-    ('2023-01-03 14:00:00', 'A1:B2:C3:D4:E5:F6', 0.3, -0.6, 1.5, -0.2, 1.1, -0.7),
-    ('2023-01-03 15:30:00', 'C3:D4:E5:F6:A1:B2', -0.5, 1.2, -0.9, 0.8, -0.4, 1.3),
-    ('2023-01-04 09:00:00', 'E5:F6:A1:B2:C3:D4', 1.2, 0.7, -0.4, -1.0, 0.6, -0.2),
-    ('2023-01-04 10:15:00', 'A1:B2:C3:D4:E5:F6', -0.7, 1.5, 0.2, 0.5, -1.3, 0.9),
-    ('2023-01-05 11:30:00', 'C3:D4:E5:F6:A1:B2', 0.9, -0.4, 1.1, 0.3, 0.8, -1.0),
-    ('2023-01-05 13:00:00', 'E5:F6:A1:B2:C3:D4', -1.5, 0.2, -1.2, 1.2, -0.7, 0.4);
+INSERT INTO mpu6050_data_table (creation_time, recording_id, generated_by, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z) VALUES 
+    ('2023-01-01 08:00:00', 1, '00:11:22:33:44:55', 0.5, -1.2, 2.0, 0.1, -0.8, 0.5),
+    ('2023-01-01 09:15:00', 1, 'AA:BB:CC:DD:EE:FF', 1.2, 0.8, -0.3, -0.2, 0.7, -0.4),
+    ('2023-01-01 10:30:00', 1, '11:22:33:44:55:66', -0.3, 0.5, 1.8, 1.0, -1.5, 0.9),
+    ('2023-01-02 08:30:00', 1, '00:11:22:33:44:55', 0.8, -1.5, 2.5, -0.3, -0.9, 0.7),
+    ('2023-01-02 09:45:00', 1, 'AA:BB:CC:DD:EE:FF', 1.5, 0.3, -0.8, -0.5, 0.6, -0.1),
+    ('2023-01-03 12:45:00', 1, '11:22:33:44:55:66', -1.0, 0.8, 1.2, 0.9, -1.2, 1.1),
+    ('2023-01-03 14:00:00', 1, 'A1:B2:C3:D4:E5:F6', 0.3, -0.6, 1.5, -0.2, 1.1, -0.7),
+    ('2023-01-03 15:30:00', 1, 'C3:D4:E5:F6:A1:B2', -0.5, 1.2, -0.9, 0.8, -0.4, 1.3),
+    ('2023-01-04 09:00:00', 1, 'E5:F6:A1:B2:C3:D4', 1.2, 0.7, -0.4, -1.0, 0.6, -0.2),
+    ('2023-01-04 10:15:00', 1, 'A1:B2:C3:D4:E5:F6', -0.7, 1.5, 0.2, 0.5, -1.3, 0.9),
+    ('2023-01-05 11:30:00', 1, 'C3:D4:E5:F6:A1:B2', 0.9, -0.4, 1.1, 0.3, 0.8, -1.0),
+    ('2023-01-05 13:00:00', 1, 'E5:F6:A1:B2:C3:D4', -1.5, 0.2, -1.2, 1.2, -0.7, 0.4);
 
 
 INSERT INTO user_table (fname, lname, user_desc)
@@ -85,7 +96,3 @@ VALUES
     ('2023-01-15 19:00:00', 0, '11:22:33:44:55:66', '{"entry_number": 15, "random_value": 0.789}'),
     ('2023-01-16 19:30:00', 0, '22:33:44:55:66:77', '{"entry_number": 16, "random_value": 0.234}');
 
-INSERT INTO project_table (project_name, project_desc, created_on, github_link)
-VALUES 
-    ("dogTrackerProject", "A fun IOT project to track my dogs movement", '2023-11-21 10:12:00', "https://github.com/cstainsby/DogTracker"),
-    ("piLocalServer", "A home server hosted on my raspberry pi", '2023-11-21 10:12:00', 'https://github.com/cstainsby/PiLocalNetwork');

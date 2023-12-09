@@ -1,6 +1,6 @@
 
 class Project():
-    def __init__(self) -> None:
+    def __init__(self, data: dict = None) -> None:
         '''
         Parse an instance of user json for data 
 
@@ -16,12 +16,12 @@ class Project():
         self.desc = ""
         self.created_on = ""
         self.github_link = None
-    
-    def inflate_from_sqlLite_dict(self, data: dict):
-        self.title = data["title"] 
-        self.desc = data["desc"] 
-        self.created_on = data["created_on"] 
-        self.github_link = data["github_link"] if "github_link" in data else None
+
+        if data is not None:
+            self.title = data["title"] 
+            self.desc = data["desc"] 
+            self.created_on = data["created_on"] 
+            self.github_link = data["github_link"] if "github_link" in data else None
     
     def to_template_data_format(self) -> dict:
         template_data = {

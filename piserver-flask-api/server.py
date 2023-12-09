@@ -1,3 +1,9 @@
+"""
+    A lot of my views will make calls to both my own endpoints for very common workflows,
+    and also have custom db calls for specific use cases
+"""
+
+
 from flask import Flask, request, jsonify, render_template, g
 from datetime import datetime
 import requests
@@ -23,7 +29,9 @@ HOST = '0.0.0.0'
 app = Flask(__name__)
 dbo = PiDatabase(debug_mode=DEBUG_MODE)
 
-# device mac_address (identifier) to its ip
+# this data structure will be filled with devices when they are initially turned on 
+# it will hold information which will be important to have on hand while connected 
+# devices are generating time sensitive information by reducing lookup overhead
 active_connections = {}
 
 
@@ -49,12 +57,13 @@ def home():
     devices = []
     projects = []
 
-    devices_list_request = build_request_to_self("/api/devices")
-    devices_json_data = requests.get(devices_list_request).json()
+    # devices_list_request = build_request_to_self("/api/devices")
+    # devices_json_data = requests.get(devices_list_request).json()
     # checked_out_devices = dbo.get_active_devices_with_user_info(cursor)
 
-    print(devices_json_data)
+    # print(devices_json_data)
 
+    # for raw_device in devices_json_data["data"]:
 
 
 
@@ -82,12 +91,15 @@ def home():
     #         "user_lname": device[5]
     #     })
 
+    # find all active devices
+    
+
+
     projects_list_request = build_request_to_self("/api/projects")
     projects_json_data = requests.get(projects_list_request).json()
     
     for raw_project in projects_json_data["data"]:
-        formated_project = Project()
-        formated_project.inflate_from_sqlLite_dict({
+        formated_project = Project({
             "title": raw_project[0],
             "desc": raw_project[1],
             "created_on": raw_project[2],
@@ -261,6 +273,10 @@ def checkout_view(checkout_id):
     return render_template("checkout_page.html")
 
 
+# @app.route('/api/info', methods=["GET"])
+# def api_info_view():
+#     return render_template("")
+
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -270,13 +286,16 @@ def ping():
 @app.route('/api/devices', methods=["GET", "POST"])
 def devices_api():
     if request.method == "GET":
+        # get query parameters
+        only_active_devices = request.args.get("only_active", default=False)
+
         devices = []
 
         with app.app_context():
             conn = dbo.get_db()
             cursor = conn.cursor()
 
-            devices = dbo.get_all_devices(cursor)
+            devices = dbo.get_all_devices(cursor, only_active_devices)
             
             conn.commit()
 
@@ -316,7 +335,33 @@ def device_log_api():
         return jsonify({'status': 'success', 'data': logs})
         
     elif request.method == "POST":
-        pass
+        try:
+            data = request.get_json()
+
+            # Extracting values from the JSON data
+            creation_time = data.get('creation_time')
+            status_code = data.get('status_code')
+            log_data = data.get('log_data')
+
+            # Extracting mac_address from the log_data
+            mac_address = log_data.get('mac_address')
+
+            # Assuming 'time_since_start' is a key in log_data
+            time_since_start = log_data.get('time_since_start')
+
+            time_delta = datetime.timedelta(seconds=time_since_start)
+        
+
+            # Now you can use creation_time, status_code, mac_address, log_data, and time_delta as needed
+
+            # ... (perform database insertion or other operations)
+
+            return jsonify({"status": "success", "msg": "Log successfully added"})
+
+        except Exception as e:
+            return jsonify({"status": "error", "msg": f"Failed to process the request: {str(e)}"})
+
+        
     else:
         return jsonify({"status": "error", "msg": "invalid request method used"})
 
@@ -377,20 +422,40 @@ def devices_associated_to_project(project_name):
         return jsonify({"status": "error", "msg": "invalid request method used"})
 
 
+@app.route('/api/device/<mac_address>/initialize', methods=["POST"])
+def device_initialization(mac_address):
 
-@app.route('/api/device/<mac_address>/project/<project_name>/mpu-motion6', methods=['POST'])
-def dog_tracker_motion_data(mac_address, project_name):
+    # find the type of the device, we can format the data based off of that
+
+    # if mac_address in active_connections:
+    #     # end currently running recording
+
+    
+
+    # # begin new recording
+    # # the new recording will be assumed to be under the same person who checked out 
+    # active_connections[mac_address] = 
+    pass
+
+@app.route('/api/device/<mac_address>/mpu-motion6', methods=['POST'])
+def device_data_api(mac_address):
     '''
-    api endpoint for tracking 
+    api endpoint for all device data production
     '''
+
+    # from the mac address, we can determine everything we need to about how to store the data in the db
+
     try:
         data = request.json  # Assuming the data is sent as JSON
 
-        # print(MPU6050_Data(data))
+        # find the type of the device, we can format the data based off of that
 
-        # motion_data = MPU6050_Data(**data)
+        
+        with app.app_context():
+            conn = dbo.get_db()
+            cursor = conn.cursor()
 
-        # db.add_dog_motion_data(motion_data)
+            dbo.get_de
 
         
         

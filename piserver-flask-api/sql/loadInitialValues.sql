@@ -29,3 +29,9 @@ WHERE NOT EXISTS (
     WHERE fname = 'Scout' AND lname = 'Stainsby'
     LIMIT 1
 );
+
+
+INSERT INTO project_table (project_name, project_desc, created_on, github_link)
+VALUES 
+    ("dogTrackerProject", "A fun IOT project to track my dogs movement", '2023-11-21 10:12:00', "https://github.com/cstainsby/DogTracker"),
+    ("piLocalServer", "A home server hosted on my raspberry pi", '2023-11-21 10:12:00', 'https://github.com/cstainsby/PiLocalNetwork');

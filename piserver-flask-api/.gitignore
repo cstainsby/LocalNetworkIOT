@@ -3,3 +3,5 @@ pi_server.db
 test.db
 
 sql/insertInitialValues.sql
+
+server_env

@@ -51,6 +51,9 @@ class PiDatabase():
         if db is None:
             db = g._database = sqlite3.connect(self.DATABASE_NAME)
         return db
+    
+
+    
 
     def get_user_by_id(self, db_cursor: Cursor, id: int):
         '''
@@ -82,7 +85,7 @@ class PiDatabase():
         """)
         return db_cursor.fetchall()
 
-    def get_active_devices_with_user_info(self, db_cursor: Cursor):
+    def get_active_devices(self, db_cursor: Cursor):
         db_cursor.execute("""
             SELECT dev.mac_address, dev.device_name, dev.device_desc, 
                 checkout.start_time, 
@@ -93,6 +96,28 @@ class PiDatabase():
             WHERE checkout.end_time IS NULL 
         """)
         return db_cursor.fetchall()
+
+    def get_devices(self, db_cursor: Cursor, 
+        device_type: str = None,
+        is_active: bool = None,
+        has_github: bool = None):
+
+        sql_build_query = '''
+            SELECT dev.mac_address, dev.device_name, dev.device_type, dev.device_desc, dev.github_link
+            FROM registered_device_table dev
+            WHERE 1=1
+        '''
+
+        if device_type:
+            sql_build_query += f" AND dev.device_type = '{device_type}'"
+        if has_github is not None:
+            sql_build_query += f" AND dev.gihub_link IS " + ("NOT" if not has_github else "") + " NULL"
+        if is_active:
+            sql_build_query += "WHERE "
+
+        db_cursor.execute(sql_build_query + ';')
+        return db_cursor.fetchall()
+
     
     def add_device_log(self, db_cursor: Cursor):
         db_cursor.execute('''
@@ -177,3 +202,10 @@ class PiDatabase():
 
     def get_dog_motion_data(self):
         pass
+
+    
+    def end_recording(self, db_cursor: Cursor, mac_address: str):
+        db_cursor.execute('''
+            UPDATE recording_table
+            WHERE mac_
+        ''', (mac_address))
