@@ -56,7 +56,7 @@ def git_pull(repository_url, local_directory):
 def run_server():
     """
     """
-    pass
+    
 
 
 def main():
@@ -64,18 +64,25 @@ def main():
     Starts a new s
 
     """
+
+    # initialize avahi server
     print("Checking if avahi server is intialized and running...")
     if not is_avahi_running():
         print("Avahi server not running, starting server...")
+        attempt_count = 0
         while not is_avahi_running() and initialize_avahi_server():
             print("Attempting to initialize")
+            attempt_count += 1
+            timeout(attempt_count)
 
-
+    # pull github code changes
     if "--pull-git-changes" in sys.argv:
         print("Pulling any changes from github...")
         git_pull(repository_url, local_directory)
-
-    print("Starting server...")
+    
+    # setup the flask enviornment
+    print("Initializing app environment...")
+    
 
 
     

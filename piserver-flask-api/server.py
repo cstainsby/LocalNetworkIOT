@@ -92,7 +92,7 @@ def home():
     #     })
 
     # find all active devices
-    
+    # first get 
 
 
     projects_list_request = build_request_to_self("/api/projects")

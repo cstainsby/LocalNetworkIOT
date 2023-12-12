@@ -66,14 +66,6 @@ class PiDatabase():
         """, (id,))
         return db_cursor.fetchone()
 
-    def get_all_devices(self, db_cursor: Cursor):
-        '''
-        Get all devices currently registered to the system
-        '''
-        db_cursor.execute("""
-            SELECT * FROM registered_device_table
-        """)
-        return db_cursor.fetchall()
     
     def get_deactivated_devices(self, db_cursor: Cursor):
         db_cursor.execute("""
@@ -117,6 +109,9 @@ class PiDatabase():
 
         db_cursor.execute(sql_build_query + ';')
         return db_cursor.fetchall()
+
+    def device_activities(self, db_cursor: Cursor,):
+        
 
     
     def add_device_log(self, db_cursor: Cursor):
