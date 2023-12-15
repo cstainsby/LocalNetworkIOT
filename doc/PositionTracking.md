@@ -11,8 +11,26 @@ The method you are referring to is often called "WiFi triangulation" or "WiFi po
     
     - **Triangulation**: This method involves measuring the angles between the device and the known access points. By using the known positions of the access points and the measured angles, you can triangulate the device's position.
 
+#### Trilateration Image
+![Trilateration Image](img/trilaterationImg.jpg)
+
+
 4. **Signal Strength Measurements**: The device continuously measures the signal strength from the known access points. These measurements are sent to a central server or processed locally.
 
 5. **Algorithm and Calculation**: An algorithm processes the signal strength measurements and uses them to calculate the device's probable location. This often involves complex mathematical computations and algorithms to refine the accuracy of the location estimate.
 
 It's important to note that WiFi triangulation has limitations. Factors such as obstacles, interference, and changes in the environment can affect the accuracy of the location estimation. Additionally, the method may not work well in densely populated areas or areas with a high level of WiFi interference.
+
+## Usage and Other Considerations
+In this project, I will use 4 ESP32's which will be used to compose the all of the devices mentioned. 
+- 3 will be the anchors which are used as reference
+- 1 will be the tracked device
+
+This system wont need to track fine grain movement so that allows us to send data back to the server to handle the calculations needed.
+
+In the context of the **Dog Project** updates will only need to be handled realistically every second which gives us some leaniency in optimization for speed, although that still will be a consideration.
+
+
+
+
+

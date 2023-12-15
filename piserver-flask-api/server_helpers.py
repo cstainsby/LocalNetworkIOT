@@ -34,3 +34,4 @@ def add_request_parameters(requestUrl: str, parameters: List[Tuple[str, str]]):
 
         build_url += str(param_name) + "=" + str(param_value) 
     return build_url
+
